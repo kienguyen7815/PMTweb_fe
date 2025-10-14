@@ -3,10 +3,14 @@ import logo from '../../assets/img/BrandTaskHub.png'
 import BtnPale from '../button/BtnPale'
 import BtnBold from '../button/BtnBold'
 import { useState, useEffect } from 'react'
+import { useAuth } from '../../contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 const Header = () => {
   const [isVisible, setIsVisible] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
+  const { user, logout, isAuthenticated } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,8 +50,34 @@ const Header = () => {
           </ul>
         </div>
         <div className="header-right">
-          <BtnPale style={{ width: '125px' }}>Đăng Nhập</BtnPale>
-          <BtnBold style={{ width: '125px' }}>Đăng Ký</BtnBold>
+          {isAuthenticated ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <span style={{ color: '#fff', fontWeight: '500' }}>
+                Xin chào, {user?.username}
+              </span>
+              <BtnPale 
+                style={{ width: '125px' }}
+                onClick={logout}
+              >
+                Đăng xuất
+              </BtnPale>
+            </div>
+          ) : (
+            <>
+              <BtnPale 
+                style={{ width: '125px' }}
+                onClick={() => navigate('/login')}
+              >
+                Đăng Nhập
+              </BtnPale>
+              <BtnBold 
+                style={{ width: '125px' }}
+                onClick={() => navigate('/register')}
+              >
+                Đăng Ký
+              </BtnBold>
+            </>
+          )}
         </div>
       </div>
     </header>
