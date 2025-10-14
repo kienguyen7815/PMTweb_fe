@@ -1,6 +1,7 @@
 import "../inforLayout/InforLayout.css";
 import imgBgr from "../../assets/img/ai-5202865_1920.jpg";
 import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
 const InforLayout = () => {
 	const featuresSectionRef = useRef(null);
@@ -51,7 +52,9 @@ const InforLayout = () => {
 						dõi tiến độ dự án một cách dễ dàng.
 					</p>
 					<div className="hero-buttons">
-						<button className="btn_start">BẮT ĐẦU NGAY</button>
+						<Link to="/login">
+							<button className="btn_start">BẮT ĐẦU NGAY</button>
+						</Link>
 						<button className="btn_learn">TÌM HIỂU THÊM</button>
 					</div>
 				</div>
@@ -125,7 +128,6 @@ const InforLayout = () => {
 					</div>
 				</section>
 
-				
 				<div className="features-cta-section">
 					<div className="cta-section">
 						<h2 className="cta-title">
@@ -136,7 +138,9 @@ const InforLayout = () => {
 							việc hiệu quả nhất cho nhóm freelancer của bạn.
 						</p>
 						<div className="cta-buttons">
-							<button className="btn_start">BẮT ĐẦU NGAY</button>
+							<Link to="/login">
+								<button className="btn_start">BẮT ĐẦU NGAY</button>
+							</Link>
 							<button className="btn_learn">TÌM HIỂU THÊM</button>
 						</div>
 					</div>

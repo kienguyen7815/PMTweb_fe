@@ -1,12 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
 import './Login.css';
 
 const Login = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  // Tự động ẩn thông báo lỗi sau 5 giây (tương tự Register)
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+  
+  // Lấy URL redirect từ state
+  const from = location.state?.from?.pathname || '/';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -16,10 +36,20 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Xử lý đăng nhập ở đây
-    console.log('Form data:', formData);
+    setLoading(true);
+    setError('');
+
+    try {
+      await login(formData);
+      // Đăng nhập thành công, chuyển hướng về trang trước đó hoặc home
+      navigate(from, { replace: true });
+    } catch (error) {
+      setError(error.message || 'Có lỗi xảy ra khi đăng nhập');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -39,6 +69,19 @@ const Login = () => {
 
   return (
     <div className="login-container">
+      {/* Error notification */}
+      {error && (
+        <div className="error-notification">
+          <div className="error-content">
+            <span className="error-icon">⚠️</span>
+            <span className="error-message">{error}</span>
+            <button className="error-close" onClick={() => setError('')}>
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="login-card">
         <div className="login-header">
           <h2>Đăng Nhập</h2>
@@ -91,8 +134,8 @@ const Login = () => {
             </button>
           </div>
 
-          <button type="submit" className="login-button">
-            Đăng Nhập
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? 'Đang đăng nhập...' : 'Đăng Nhập'}
           </button>
         </form>
 
