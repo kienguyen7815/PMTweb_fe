@@ -78,7 +78,7 @@ const Footer = () => {
 
 				{/* Copyright */}
 				<div className="footer-copyright">
-					<p>Nguyễn Văn Kiện</p>
+					<p>Copyright ©2025 - Bản quyền thuộc về Nguyễn Văn Kiện</p>
 				</div>
 			</footer>
 		</div>

@@ -1,5 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect} from 'react';
 import authService from '../services/authService';
+
+// Singleton để tránh duplicate initialization
+let authInitialized = false;
 
 const AuthContext = createContext();
 
@@ -17,31 +20,54 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    // Chỉ initialize một lần duy nhất
+    if (authInitialized) {
+      setLoading(false);
+      return;
+    }
+    
+    let isMounted = true;
+    
     // Kiểm tra token khi app khởi động
     const initAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (token) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Initializing auth with token...');
+          }
           // Kiểm tra token có hợp lệ không bằng cách gọi API profile
           const response = await authService.getProfile();
-          if (response.success) {
+          if (response.success && isMounted) {
             setUser(response.data.user);
             setIsAuthenticated(true);
-          } else {
-            // Token không hợp lệ, xóa khỏi localStorage
+          } else if (isMounted) {
+            // Token không hợp lệ, xóa khỏi sessionStorage
             authService.logout();
           }
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
-        authService.logout();
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Auth initialization error:', error);
+        }
+        if (isMounted) {
+          authService.logout();
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+          authInitialized = true; // Đánh dấu đã initialize
+        }
       }
     };
 
     initAuth();
-  }, []);
+    
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array để chỉ chạy một lần
 
   const login = async (credentials) => {
     try {
@@ -75,6 +101,7 @@ export const AuthProvider = ({ children }) => {
     authService.logout();
     setUser(null);
     setIsAuthenticated(false);
+    authInitialized = false; // Reset flag để có thể initialize lại
   };
 
   const updateProfile = async (userData) => {
@@ -90,6 +117,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const uploadAvatar = async (file) => {
+    try {
+      const response = await authService.uploadAvatar(file);
+      if (response.success) {
+        setUser(response.data.user);
+        return response;
+      }
+      throw new Error(response.message || 'Upload avatar thất bại');
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const value = {
     user,
     isAuthenticated,
@@ -98,6 +138,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateProfile,
+    uploadAvatar,
   };
 
   return (

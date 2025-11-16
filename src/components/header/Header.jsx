@@ -37,7 +37,7 @@ const Header = () => {
       <div className="header-container">
         <div className="header-logo">
           <img src={logo} alt="logo" className='logo-img'/>
-          <h1 className='logo-text'>TASK HUB</h1>
+          <p className='logo-text'>TASK HUB</p>
         </div>
         <div className="header-nav">
           <ul className="nav-list">

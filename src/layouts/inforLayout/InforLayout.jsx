@@ -5,18 +5,18 @@ import { Link } from "react-router-dom";
 
 const InforLayout = () => {
 	const featuresSectionRef = useRef(null);
-	let isScrolling = false;
+	const isScrollingRef = useRef(false);
 
 	useEffect(() => {
 		const handleScroll = (e) => {
-			if (isScrolling) return;
+			if (isScrollingRef.current) return;
 
 			const scrollDirection = e.deltaY > 0 ? "down" : "up";
 			const scrollPosition = window.scrollY;
 			const windowHeight = window.innerHeight;
 
 			if (scrollDirection === "down") {
-				isScrolling = true;
+				isScrollingRef.current = true;
 				if (scrollPosition < windowHeight * 0.5) {
 					featuresSectionRef.current?.scrollIntoView({
 						behavior: "smooth",
@@ -24,7 +24,7 @@ const InforLayout = () => {
 					});
 				}
 				setTimeout(() => {
-					isScrolling = false;
+					isScrollingRef.current = false;
 				}, 1000);
 			}
 		};
@@ -40,12 +40,12 @@ const InforLayout = () => {
 		<div>
 			<div className="container-inforLayout">
 				<div className="img_bgr">
-					<img src={imgBgr} />
+					<img src={imgBgr} alt="logo"/>
 				</div>
 
 				{/* Hero Content */}
 				<div className="hero-content">
-					<h1 className="hero-title">TASK HUB</h1>
+					<p className="hero-title">TASK HUB</p>
 					<p className="hero-description">
 						Hệ thống quản lý công việc chuyên nghiệp dành cho nhóm freelancer.
 						Tối ưu hóa quy trình làm việc, tăng cường hiệu quả cộng tác và theo

@@ -467,19 +467,19 @@
 
 /* Custom scrollbar for register card */
 .reg-card::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .reg-card::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
+  background: rgba(27, 26, 85, 0.2);
+  border-radius: 4px;
 }
 
 .reg-card::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
+  background: rgba(146, 144, 195, 0.6);
+  border-radius: 4px;
 }
 
 .reg-card::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: rgba(146, 144, 195, 0.8);
 }
