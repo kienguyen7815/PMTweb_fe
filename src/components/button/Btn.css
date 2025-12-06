@@ -7,8 +7,9 @@
   padding: 10px 20px;
   cursor: pointer;
   font-size: 16px;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease, color 0.3s ease;
 }
+
 .btn-pale {
   background: rgba(255, 255, 255, 0.3);
   color: #fff;
@@ -24,7 +25,32 @@
     transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .btn-pale:hover,
 .btn-bold:hover {
   transform: translateY(-4px);
+}
+
+/* Styles cho buttons khi header ở nền sáng */
+.header-light-bg .btn-pale {
+  background: #fff;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.header-light-bg .btn-pale:hover {
+  background: #667eea;
+  color: #fff;
+  border: 2px solid #667eea;
+}
+
+.header-light-bg .btn-bold {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+}
+
+.header-light-bg .btn-bold:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
