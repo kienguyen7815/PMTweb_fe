@@ -5,12 +5,19 @@
   right: 0;
   z-index: 1000;
   height: 80px;
-  transition: transform 0.3s ease-in-out;
-
+  transition: transform 0.3s ease-in-out, background-color 0.3s ease;
+  background-color: transparent;
 }
 
 .header-hidden {
   transform: translateY(-100%);
+}
+
+/* Khi header ở trên nền sáng/trắng */
+.header-light-bg {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .header-container {
@@ -36,8 +43,15 @@
     font-weight: 900;
     letter-spacing: 4px;
     color: #fff;
+    transition: color 0.3s ease;
   }
 }
+
+/* Màu logo khi ở nền sáng */
+.header-light-bg .logo-text {
+  color: #000;
+}
+
 
 .header-nav {
   flex: 1;
@@ -65,11 +79,25 @@
   padding: 8px 12px;
   margin-right: 20px;
   border-bottom: 2px solid transparent;
-  transition: border-bottom-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .nav-link:hover {
-  border-bottom: 2px solid white ;
+  border-bottom: 2px solid white;
+}
+
+.nav-link i {
+  margin-left: 5px;
+  font-size: 0.75em;
+}
+
+/* Màu nav link khi ở nền sáng */
+.header-light-bg .nav-link {
+  color: #333;
+}
+
+.header-light-bg .nav-link:hover {
+  border-bottom: 2px solid black;
 }
 
 .header-right {
@@ -78,3 +106,47 @@
   gap: 20px;
 }
 
+.user-greeting {
+  color: #fff;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+/* Màu chữ greeting khi ở nền sáng */
+.header-light-bg .user-greeting {
+  color: #000;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .header-nav {
+    display: none;
+  }
+  
+  .header-logo .logo-text {
+    font-size: 20px;
+    letter-spacing: 2px;
+  }
+  
+  .header-logo .logo-img {
+    width: 40px;
+  }
+}
+
+@media (max-width: 568px) {
+  .header {
+    height: 70px;
+  }
+  
+  .header-container {
+    padding: 0 15px;
+  }
+  
+  .header-right {
+    gap: 10px;
+  }
+  
+  .user-greeting {
+    font-size: 0.9rem;
+  }
+}
