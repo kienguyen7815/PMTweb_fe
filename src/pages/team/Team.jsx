@@ -19,8 +19,9 @@ const emptyMember = {
 const Team = () => {
   const { user } = useAuth();
   const permissions = usePermissions();
-  const canManage = permissions.canManageUsers;
-  const canDelete = permissions.canDeleteUsers;
+  // Sử dụng canManageMembers trong workspace, canManageUsers ở global scope
+  const canManage = permissions.canManageMembers || permissions.canManageUsers;
+  const canDelete = permissions.canDelete || permissions.canDeleteUsers;
 
   const [members, setMembers] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -32,6 +33,7 @@ const Team = () => {
   const [loading, setLoading] = useState(false);
   const [emailSuggestions, setEmailSuggestions] = useState([]);
   const [showEmailSuggestions, setShowEmailSuggestions] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const addToast = (message, type = 'success') => {
     const id = `t_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
@@ -67,16 +69,12 @@ const Team = () => {
   };
 
   useEffect(() => {
-    // Chặn member truy cập trang này
-    if (user?.role === 'mb') {
-      return;
-    }
-    
     // Chỉ load nếu có quyền (ad, pm, tl)
+    // Phân quyền dựa trên workspace role hoặc global role
     if (canManage || permissions.canViewTeam) {
       loadMembers();
     }
-  }, [canManage, permissions.canViewTeam, user]);
+  }, [canManage, permissions.canViewTeam]);
 
   const openCreate = () => {
     setEditingId(null);
@@ -250,20 +248,42 @@ const Team = () => {
             <p className="subtitle">Quản lý thông tin và vai trò của các thành viên trong hệ thống.</p>
           </div>
         </div>
-        {(canManage || permissions.canViewTeam) && (
-          <div className="header-actions">
-            <span className="badge-prj">
-              <i className="fas fa-users"></i>
-              {members.length} thành viên
-            </span>
-            {canManage && (
-              <button className="primary" type="button" onClick={openCreate}>
-                <i className="fas fa-plus"></i>
-                Thêm thành viên
+        <div className="header-right-section">
+          <div className="header-search">
+            <i className="fas fa-search search-icon"></i>
+            <input
+              type="text"
+              placeholder="Tìm kiếm thành viên..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input"
+            />
+            {searchQuery && (
+              <button
+                className="search-clear"
+                onClick={() => setSearchQuery('')}
+                type="button"
+                title="Xóa tìm kiếm"
+              >
+                <i className="fas fa-times"></i>
               </button>
             )}
           </div>
-        )}
+          {(canManage || permissions.canViewTeam) && (
+            <div className="header-actions">
+              <span className="badge-prj">
+                <i className="fas fa-users"></i>
+                {members.length} thành viên
+              </span>
+              {canManage && (
+                <button className="primary" type="button" onClick={openCreate}>
+                  <i className="fas fa-plus"></i>
+                  Thêm thành viên
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -273,20 +293,34 @@ const Team = () => {
         </div>
       ) : (
         <div className="team-table-container">
-          {members.length > 0 ? (
-            <table className="team-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Tên</th>
-                  <th>Email</th>
-                  <th>Ngày sinh</th>
-                  <th>Nghề nghiệp</th>
-                  {canManage && <th className="actions-column">Thao tác</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {members.map(m => (
+          {(() => {
+            // Filter members based on search query
+            const filteredMembers = members.filter(m => {
+              if (!searchQuery.trim()) return true;
+              const query = searchQuery.toLowerCase();
+              return (
+                m.name?.toLowerCase().includes(query) ||
+                m.email?.toLowerCase().includes(query) ||
+                m.occupation?.toLowerCase().includes(query) ||
+                m.id?.toString().includes(query)
+              );
+            });
+
+            return filteredMembers.length > 0 || members.length === 0 ? (
+              <table className="team-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Tên</th>
+                    <th>Email</th>
+                    <th>Ngày sinh</th>
+                    <th>Nghề nghiệp</th>
+                    {canManage && <th className="actions-column">Thao tác</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredMembers.length > 0 ? (
+                    filteredMembers.map(m => (
                   <tr key={m.id}>
                     <td className="id-cell">{m.id}</td>
                     <td className="name-cell">
@@ -320,18 +354,34 @@ const Team = () => {
                       </td>
                     )}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <EmptyState
-              icon="fa-users"
-              title="Chưa có thành viên nào"
-              description="Thêm thành viên mới để bắt đầu quản lý."
-              actionLabel={canManage && permissions.canViewTeam ? "Thêm thành viên đầu tiên" : null}
-              onAction={canManage && permissions.canViewTeam ? openCreate : null}
-            />
-          )}
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={canManage ? 6 : 5} style={{ textAlign: 'center', padding: '40px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                          <i className="fas fa-search" style={{ fontSize: '48px', color: '#9ca3af' }}></i>
+                          <div style={{ fontSize: '16px', fontWeight: '600', color: '#374151' }}>
+                            Không tìm thấy thành viên
+                          </div>
+                          <div style={{ fontSize: '14px', color: '#6b7280' }}>
+                            Không có thành viên nào khớp với từ khóa "{searchQuery}"
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <EmptyState
+                icon="fa-users"
+                title="Chưa có thành viên nào"
+                description="Thêm thành viên mới để bắt đầu quản lý."
+                actionLabel={canManage && permissions.canViewTeam ? "Thêm thành viên đầu tiên" : null}
+                onAction={canManage && permissions.canViewTeam ? openCreate : null}
+              />
+            );
+          })()}
         </div>
       )}
 

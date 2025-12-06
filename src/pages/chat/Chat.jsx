@@ -293,44 +293,33 @@ const Chat = () => {
   const groupedMessages = groupMessagesByDate(comments);
 
   return (
-    <div className="teams-chat-page">
+    <div className="chat-chat-page">
       <ToastContainer toasts={toasts} onRemove={removeToast} />
       
       {/* Top Header Bar */}
-      <div className="teams-header">
-        <div className="teams-header-left">
-          <h1 className="teams-header-title">Chat</h1>
+      <div className="chat-header">
+        <div className="chat-header-left">
+          <h1 className="chat-header-title">Chat</h1>
         </div>
-        <div className="teams-header-center">
-          <div className="teams-search-box">
-            <i className="fas fa-search"></i>
-            <input 
-              type="text" 
-              placeholder="Tìm kiếm trong cuộc trò chuyện..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="teams-header-right">
-          <div className="teams-user-info">
-            <div className="teams-user-avatar">
+        <div className="chat-header-right">
+          <div className="chat-user-info">
+            <div className="chat-user-avatar">
               {user?.avatar ? (
                 <img src={getAvatarUrl(user.avatar)} alt={user.username} />
               ) : (
                 <span>{getLastName(user?.username || 'U').charAt(0).toUpperCase()}</span>
               )}
             </div>
-            <span className="teams-user-name">{user?.username || 'User'}</span>
+            <span className="chat-user-name">{user?.username || 'User'}</span>
             <i className="fas fa-chevron-down"></i>
           </div>
         </div>
       </div>
 
-      <div className="teams-content">
+      <div className="chat-content">
         {/* Left Sidebar */}
-        <div className="teams-sidebar">
-          <div className="teams-sidebar-search">
+        <div className="chat-sidebar">
+          <div className="chat-sidebar-search">
             <i className="fas fa-search"></i>
             <input 
               type="text" 
@@ -340,36 +329,36 @@ const Chat = () => {
             />
           </div>
 
-          <div className="teams-sidebar-section">
-            <div className="teams-sidebar-section-header">
+          <div className="chat-sidebar-section">
+            <div className="chat-sidebar-section-header">
               <i className="fas fa-comments"></i>
               <span>Đoạn chat</span>
             </div>
-            <div className="teams-chats-list">
+            <div className="chat-chats-list">
               {filteredProjects.length > 0 ? (
                 filteredProjects.map(project => (
                   <div
                     key={project.id}
-                    className={`teams-chat-item ${selectedProjectId === project.id ? 'active' : ''}`}
+                    className={`chat-chat-item ${selectedProjectId === project.id ? 'active' : ''}`}
                     onClick={() => setSelectedProjectId(project.id)}
                   >
-                    <div className="teams-chat-avatar">
+                    <div className="chat-chat-avatar">
                       <i className="fas fa-folder"></i>
                     </div>
-                    <div className="teams-chat-info">
-                      <div className="teams-chat-name">{project.name}</div>
+                    <div className="chat-chat-info">
+                      <div className="chat-chat-name">{project.name}</div>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="teams-empty-chats">Chưa có đoạn chat nào</div>
+                <div className="chat-empty-chats">Chưa có đoạn chat nào</div>
               )}
             </div>
           </div>
         </div>
 
         {/* Main Chat Area */}
-        <div className="teams-main">
+        <div className="chat-main">
           {!selectedProjectId ? (
             <EmptyState
               icon="fa-comments"
@@ -379,9 +368,9 @@ const Chat = () => {
           ) : (
             <>
               {/* Chat Header */}
-              <div className="teams-chat-header">
-                <div className="teams-chat-header-info">
-                  <div className="teams-chat-header-avatar">
+              <div className="chat-chat-header">
+                <div className="chat-chat-header-info">
+                  <div className="chat-chat-header-avatar">
                     <i className="fas fa-folder"></i>
                   </div>
                   <div>
@@ -389,35 +378,35 @@ const Chat = () => {
                     <p>Đoạn chat dự án</p>
                   </div>
                 </div>
-                <div className="teams-chat-header-actions">
-                  <button className="teams-header-btn">
+                <div className="chat-chat-header-actions">
+                  <button className="chat-header-btn">
                     <i className="fas fa-search"></i>
                   </button>
-                  <button className="teams-header-btn">
+                  <button className="chat-header-btn">
                     <i className="fas fa-ellipsis-v"></i>
                   </button>
                 </div>
               </div>
 
               {/* Messages Area */}
-              <div className="teams-messages">
+              <div className="chat-messages">
                 {loading ? (
                   <LoadingState message="Đang tải bình luận..." />
                 ) : (
                   <>
                     {Object.keys(groupedMessages).length > 0 ? (
                       Object.keys(groupedMessages).map(dateKey => (
-                        <div key={dateKey} className="teams-message-group">
-                          <div className="teams-date-divider">
+                        <div key={dateKey} className="chat-message-group">
+                          <div className="chat-date-divider">
                             <span>{dateKey}</span>
                           </div>
                           {groupedMessages[dateKey].map(comment => (
                             <div
                               key={comment.id}
-                              className={`teams-message ${comment.user_id === user.id ? 'own' : 'other'}`}
+                              className={`chat-message ${comment.user_id === user.id ? 'own' : 'other'}`}
                             >
                               {comment.user_id !== user.id && (
-                                <div className="teams-message-avatar">
+                                <div className="chat-message-avatar">
                                   {comment.avatar ? (
                                     <img src={getAvatarUrl(comment.avatar)} alt={comment.username} />
                                   ) : (
@@ -425,37 +414,37 @@ const Chat = () => {
                                   )}
                                 </div>
                               )}
-                              <div className="teams-message-content">
+                              <div className="chat-message-content">
                                 {comment.user_id !== user.id && (
-                                  <div className="teams-message-header">
-                                    <span className="teams-message-author">{comment.username}</span>
-                                    <span className="teams-message-time">
+                                  <div className="chat-message-header">
+                                    <span className="chat-message-author">{comment.username}</span>
+                                    <span className="chat-message-time">
                                       {formatMessageTime(comment.created_at)}
                                     </span>
                                   </div>
                                 )}
-                                <div className="teams-message-bubble">
-                                  <div className="teams-message-text">{comment.comment}</div>
-                                  {comment.user_id === user.id && (
-                                    <span className="teams-message-time-inline">
-                                      {formatMessageTime(comment.created_at)}
-                                    </span>
-                                  )}
+                                <div className="chat-message-bubble">
+                                  <div className="chat-message-text">{comment.comment}</div>
                                 </div>
+                                {comment.user_id === user.id && (
+                                  <span className="chat-message-time-inline">
+                                    {formatMessageTime(comment.created_at)}
+                                  </span>
+                                )}
                               </div>
                             </div>
                           ))}
                         </div>
                       ))
                     ) : (
-                      <div className="teams-empty-messages">
+                      <div className="chat-empty-messages">
                         <i className="fas fa-comments"></i>
                         <p>Chưa có tin nhắn nào. Hãy bắt đầu cuộc trò chuyện!</p>
                       </div>
                     )}
                     {typingUsers.size > 0 && (
-                      <div className="teams-typing-indicator">
-                        <div className="teams-typing-dots">
+                      <div className="chat-typing-indicator">
+                        <div className="chat-typing-dots">
                           <span></span>
                           <span></span>
                           <span></span>
@@ -469,36 +458,36 @@ const Chat = () => {
               </div>
 
               {/* Input Area */}
-              <div className="teams-input-area">
-                <form className="teams-input-form" onSubmit={handleSendComment}>
-                  <div className="teams-input-toolbar">
-                    <button type="button" className="teams-toolbar-btn" title="Định dạng">
+              <div className="chat-input-area">
+                <form className="chat-input-form" onSubmit={handleSendComment}>
+                  <div className="chat-input-toolbar">
+                    <button type="button" className="chat-toolbar-btn" title="Định dạng">
                       <i className="fas fa-font"></i>
                     </button>
-                    <button type="button" className="teams-toolbar-btn" title="Emoji">
+                    <button type="button" className="chat-toolbar-btn" title="Emoji">
                       <i className="far fa-smile"></i>
                     </button>
-                    <button type="button" className="teams-toolbar-btn" title="Đính kèm">
+                    <button type="button" className="chat-toolbar-btn" title="Đính kèm">
                       <i className="fas fa-paperclip"></i>
                     </button>
                   </div>
-                  <div className="teams-input-wrapper">
+                  <div className="chat-input-wrapper">
                     <input
                       ref={inputRef}
                       type="text"
-                      className="teams-input"
+                      className="chat-input"
                       placeholder="Type a message"
                       value={newComment}
                       onChange={handleCommentChange}
                     />
                   </div>
-                  <div className="teams-input-actions">
-                    <button type="button" className="teams-toolbar-btn" title="Thêm">
+                  <div className="chat-input-actions">
+                    <button type="button" className="chat-toolbar-btn" title="Thêm">
                       <i className="fas fa-plus"></i>
                     </button>
                     <button
                       type="submit"
-                      className="teams-send-btn"
+                      className="chat-send-btn"
                       disabled={!newComment.trim()}
                       title="Gửi"
                     >

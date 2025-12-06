@@ -1,6 +1,7 @@
 import { io } from 'socket.io-client';
 
 let socket = null;
+let currentSocketWorkspaceId = null; // Lưu workspace_id của socket hiện tại
 
 const getSocket = () => {
   const token = sessionStorage.getItem('token');
@@ -9,9 +10,24 @@ const getSocket = () => {
     return null;
   }
 
-  // If socket exists and is connected, return it
+  // Lấy workspace_id hiện tại từ localStorage
+  const currentWorkspaceId = localStorage.getItem('currentWorkspaceId');
+  const newWorkspaceId = currentWorkspaceId ? parseInt(currentWorkspaceId) : null;
+  
+  // Kiểm tra xem workspace_id có thay đổi không
   if (socket && socket.connected) {
-    return socket;
+    // Nếu workspace_id thay đổi, disconnect và tạo socket mới
+    if (currentSocketWorkspaceId !== newWorkspaceId) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Workspace changed, reconnecting socket. Old:', currentSocketWorkspaceId, 'New:', newWorkspaceId);
+      }
+      socket.disconnect();
+      socket = null;
+      currentSocketWorkspaceId = null;
+    } else {
+      // Workspace không đổi, return socket hiện tại
+      return socket;
+    }
   }
 
   // If socket exists but not connected, try to reconnect
@@ -24,9 +40,21 @@ const getSocket = () => {
   // Create new socket
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3036';
   
+  // Lấy workspace_id từ localStorage nếu có
+  const workspaceId = localStorage.getItem('currentWorkspaceId');
+  
+  // Debug logging
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Socket connecting with workspace_id:', workspaceId);
+  }
+  
+  const workspaceIdForSocket = workspaceId ? parseInt(workspaceId) : null;
+  currentSocketWorkspaceId = workspaceIdForSocket; // Lưu workspace_id của socket này
+  
   socket = io(API_BASE_URL, {
     auth: {
-      token: token
+      token: token,
+      workspace_id: workspaceIdForSocket
     },
     transports: ['websocket', 'polling'],
     reconnection: true,
@@ -70,6 +98,7 @@ const disconnectSocket = () => {
   if (socket) {
     socket.disconnect();
     socket = null;
+    currentSocketWorkspaceId = null;
   }
 };
 

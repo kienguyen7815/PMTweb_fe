@@ -23,7 +23,12 @@ export const ToastContainer = ({ toasts, onRemove }) => {
   return (
     <div className="toast-container">
       {toasts.map(t => (
-        <Toast key={t.id} message={t.message} type={t.type} onClose={() => onRemove(t.id)} />
+        <Toast
+          key={t.id}
+          message={t.message}
+          type={t.type}
+          onClose={() => onRemove?.(t.id)}
+        />
       ))}
     </div>
   );

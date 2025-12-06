@@ -11,7 +11,7 @@ const api = axios.create({
   },
 });
 
-// Request interceptor để thêm token
+// Request interceptor để thêm token và workspace_id
 api.interceptors.request.use(
   (config) => {
     const token = sessionStorage.getItem('token');
@@ -19,8 +19,28 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
+    // Thêm workspace_id từ localStorage nếu có (được set bởi WorkspaceContext)
+    const workspaceId = localStorage.getItem('currentWorkspaceId');
+    if (workspaceId) {
+      config.headers['x-workspace-id'] = workspaceId;
+      // Nếu là POST/PUT và có body, thêm workspace_id vào body nếu chưa có
+      if ((config.method === 'post' || config.method === 'put') && config.data && typeof config.data === 'object' && !(config.data instanceof FormData)) {
+        if (!config.data.workspace_id) {
+          config.data.workspace_id = parseInt(workspaceId);
+        }
+      }
+      // Nếu là GET, thêm vào query params nếu chưa có
+      if (config.method === 'get' && !config.params?.workspace_id) {
+        if (!config.params) config.params = {};
+        config.params.workspace_id = workspaceId;
+      }
+    }
+    
     // Đảm bảo Content-Type được set đúng (trừ khi là FormData)
-    if (!config.headers['Content-Type'] && !(config.data instanceof FormData)) {
+    // Với FormData, để browser tự động set Content-Type với boundary
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    } else if (!config.headers['Content-Type']) {
       config.headers['Content-Type'] = 'application/json';
     }
     
@@ -29,6 +49,7 @@ api.interceptors.request.use(
       console.log('API Request:', {
         method: config.method?.toUpperCase(),
         url: config.url,
+        workspaceId: workspaceId || 'none'
       });
     }
     

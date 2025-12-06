@@ -151,11 +151,17 @@ const Profile = () => {
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
+    
+    // Reset file input để có thể chọn lại file cùng tên
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+
     if (!file) return;
 
     // Kiểm tra loại file
     if (!file.type.startsWith('image/')) {
-      alert('Vui lòng chọn file ảnh');
+      alert('Vui lòng chọn file ảnh (jpeg, jpg, png, gif, webp)');
       return;
     }
 
@@ -165,10 +171,16 @@ const Profile = () => {
       return;
     }
 
-    // Tạo preview từ file
+    // Lưu avatar cũ để khôi phục nếu có lỗi
+    const oldAvatarPreview = avatarPreview;
+
+    // Tạo preview tạm thời từ file để hiển thị ngay
     const reader = new FileReader();
     reader.onloadend = () => {
       setAvatarPreview(reader.result);
+    };
+    reader.onerror = () => {
+      console.error('Lỗi khi đọc file ảnh');
     };
     reader.readAsDataURL(file);
 
@@ -176,16 +188,39 @@ const Profile = () => {
     try {
       setLoading(true);
       const result = await uploadAvatar(file);
-      console.log('Avatar upload result:', result);
-      alert('Cập nhật avatar thành công!');
-      // Mở modal sau khi upload thành công để user có thể xem và chọn ảnh khác
-      setShowAvatarModal(true);
+      
+      if (result.success && result.data?.user) {
+        // Cập nhật avatar preview từ user object trong response
+        // Đảm bảo sử dụng avatar từ user object, không phải từ avatarUrl
+        const uploadedUser = result.data.user;
+        if (uploadedUser.avatar) {
+          const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3036';
+          const avatarUrl = uploadedUser.avatar.startsWith('http') 
+            ? uploadedUser.avatar 
+            : `${API_BASE_URL}/uploads/avatars/${uploadedUser.avatar}`;
+          setAvatarPreview(avatarUrl);
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Avatar preview updated:', {
+              avatar: uploadedUser.avatar,
+              avatarUrl: avatarUrl
+            });
+          }
+        }
+        
+        // Mở modal sau khi upload thành công để user có thể xem và chọn ảnh khác
+        setShowAvatarModal(true);
+      } else {
+        throw new Error(result.message || 'Upload thất bại');
+      }
     } catch (error) {
       console.error('Avatar upload error:', error);
       console.error('Error details:', error.response?.data || error.message);
-      alert('Có lỗi xảy ra khi cập nhật avatar: ' + (error.message || 'Lỗi không xác định'));
+      
       // Khôi phục avatar cũ
-      if (user?.avatar) {
+      if (oldAvatarPreview) {
+        setAvatarPreview(oldAvatarPreview);
+      } else if (user?.avatar) {
         const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3036';
         const avatarUrl = user.avatar.startsWith('http') 
           ? user.avatar 
@@ -194,6 +229,8 @@ const Profile = () => {
       } else {
         setAvatarPreview(null);
       }
+      
+      alert('Có lỗi xảy ra khi cập nhật avatar: ' + (error.message || 'Lỗi không xác định'));
     } finally {
       setLoading(false);
     }

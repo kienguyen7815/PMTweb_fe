@@ -19,6 +19,7 @@ const MyTasks = () => {
   const [progressDraft, setProgressDraft] = useState(0);
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const statuses = [
     { value: 'To Do', label: 'To Do' },
@@ -80,9 +81,10 @@ const MyTasks = () => {
 
     setUpdating(true);
     try {
-      const res = await taskService.update(selectedTask.task_id, {
-        progress: parseInt(progressDraft)
-      });
+      const res = await taskService.updateProgress(
+        selectedTask.task_id,
+        parseInt(progressDraft)
+      );
       if (res.success) {
         setSelectedTask(prev => ({ ...prev, progress: parseInt(progressDraft) }));
         await loadMyTasks();
@@ -100,9 +102,7 @@ const MyTasks = () => {
 
     setUpdating(true);
     try {
-      const res = await taskService.update(selectedTask.task_id, {
-        status: newStatus
-      });
+      const res = await taskService.updateStatus(selectedTask.task_id, newStatus);
       if (res.success) {
         setSelectedTask(prev => ({ ...prev, status: newStatus }));
         await loadMyTasks();
@@ -115,6 +115,17 @@ const MyTasks = () => {
     }
   };
 
+  // Filter tasks based on search query
+  const filteredTasks = tasks.filter(task => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      task.task_name?.toLowerCase().includes(query) ||
+      task.task_description?.toLowerCase().includes(query) ||
+      task.task_status?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="mytasks-page">
       <ToastContainer toasts={toasts} onRemove={removeToast} />
@@ -125,6 +136,9 @@ const MyTasks = () => {
         subtitle="Xem và cập nhật tiến độ các công việc được giao cho bạn."
         badge={tasks.length > 0 ? `${tasks.length} công việc` : ''}
         badgeIcon="fa-tasks"
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Tìm kiếm công việc..."
       />
 
       {loading ? (
@@ -132,13 +146,20 @@ const MyTasks = () => {
       ) : (
         <div className="mytasks-content">
           <div className="mytasks-list modern">
-            {tasks.map((task) => (
+            {filteredTasks.length === 0 && tasks.length > 0 ? (
+              <EmptyState
+                icon="fa-search"
+                title="Không tìm thấy công việc"
+                description={`Không có công việc nào khớp với từ khóa "${searchQuery}"`}
+              />
+            ) : (
+              filteredTasks.map((task) => (
               <div
                 key={task.id}
                 className="mytasks-card"
                 onClick={() => openTaskDetail(task)}
               >
-                <div className="card-header-gradient"></div>
+ 
                 <div className="mytasks-card-header">
                   <StatusBadge status={task.task_status} statuses={statuses} />
                   <span className="progress-badge">
@@ -172,7 +193,8 @@ const MyTasks = () => {
                   <span className="mytasks-progress-text">{task.task_progress || 0}%</span>
                 </div>
               </div>
-            ))}
+              ))
+            )}
             {tasks.length === 0 && (
               <EmptyState
                 icon="fa-tasks"

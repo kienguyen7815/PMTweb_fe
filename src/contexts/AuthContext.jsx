@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect} from 'react';
 import authService from '../services/authService';
+import { disconnectSocket } from '../services/socketService';
 
 // Singleton để tránh duplicate initialization
 let authInitialized = false;
@@ -98,7 +99,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // Xóa thông tin xác thực trên client
     authService.logout();
+
+    // Đảm bảo đóng kết nối socket hiện tại (nếu có)
+    disconnectSocket();
+
     setUser(null);
     setIsAuthenticated(false);
     authInitialized = false; // Reset flag để có thể initialize lại

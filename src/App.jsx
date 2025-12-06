@@ -1,11 +1,14 @@
 import AppRouter from "./router/AppRouter";
 import { AuthProvider } from "./contexts/AuthContext";
+import { WorkspaceProvider } from "./contexts/WorkspaceContext";
 import "./index.css";
 
 function App() {
 	return (
 		<AuthProvider>
-			<AppRouter />
+			<WorkspaceProvider>
+				<AppRouter />
+			</WorkspaceProvider>
 		</AuthProvider>
 	);
 }

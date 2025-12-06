@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { useWorkspace } from "../../contexts/WorkspaceContext";
 import usePermissions from "../../hooks/usePermissions";
 import { getLastName } from "../../utils/nameHelper";
 import "./Dashboard.css";
-import Projects from "../projects/Projects";
 import Tasks from "../tasks/Tasks";
 import MyTasks from "../myTasks/MyTasks";
 import Team from "../team/Team";
@@ -15,12 +15,15 @@ import LogoDash from "../../assets/img/BrandTaskHub.png"
 
 const Dashboard = () => {
 	const { user, logout } = useAuth();
+	const { currentWorkspace } = useWorkspace();
 	const permissions = usePermissions();
 	const navigate = useNavigate();
 	const [currentView, setCurrentView] = useState("overview");
 
-	const role = user?.role || "mb";
-	const isPM = role === "pm" || role === "ad";
+	// Ưu tiên workspace role, fallback về global role
+	const workspaceRole = currentWorkspace?.role || null;
+	const role = workspaceRole || user?.role || "mb";
+	const isPM = role === "pm" || (!workspaceRole && role === "ad");
 	const isTL = role === "tl" || isPM;
 
 	const setView = (view) => () => setCurrentView(view);
@@ -31,8 +34,6 @@ const Dashboard = () => {
 
 	const renderView = () => {
 		switch (currentView) {
-			case "projects":
-				return <Projects />;
 			case "team":
 				return <Team />;
 			case "reports":
@@ -46,7 +47,7 @@ const Dashboard = () => {
 			case "notifications":
 				return <Notifications />;
 			default:
-				return <Reports />;
+				return <Tasks />;
 		}
 	};
 
@@ -80,14 +81,6 @@ const Dashboard = () => {
 					{(isPM || isTL) && (
 						<>
 							<div className="menu-label">Quản lý dự án</div>
-							<button
-								className={`menu-item ${
-									currentView === "projects" ? "active" : ""
-								}`}
-								onClick={setView("projects")}
-							>
-								Dự án
-							</button>
 							<button
 								className={`menu-item ${
 									currentView === "team" ? "active" : ""

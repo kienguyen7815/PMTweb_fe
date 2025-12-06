@@ -360,13 +360,6 @@ const AIChat = () => {
       
       <div className="ai-chat-header">
         <div className="ai-chat-header-content">
-          <button 
-            className="back-button"
-            onClick={() => navigate(-1)}
-            title="Quay lại"
-          >
-            <i className="fas fa-arrow-left"></i>
-          </button>
           <div className="ai-chat-header-info">
             <div className="ai-chat-header-icon">
               <i className="fas fa-robot"></i>

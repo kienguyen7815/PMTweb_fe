@@ -1,14 +1,22 @@
 import { useAuth } from '../contexts/AuthContext';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 
 export const usePermissions = () => {
   const { user } = useAuth();
+  const { currentWorkspace } = useWorkspace();
 
-  if (!user) {
+  const workspaceRole = currentWorkspace?.role || null;
+  const globalRole = user?.role ? String(user.role).toLowerCase() : null;
+  const role = workspaceRole || globalRole || null;
+  const inWorkspaceContext = Boolean(workspaceRole);
+
+  if (!role) {
     return {
       isAdmin: false,
       isPM: false,
       isTL: false,
       isMember: false,
+      isClient: false,
       canView: false,
       canEdit: false,
       canManageMembers: false,
@@ -22,70 +30,77 @@ export const usePermissions = () => {
       canViewNotifications: false,
       canViewChat: false,
       canViewMyTasks: false,
-      canViewTeam: false
+      canViewTeam: false,
+      hasRole: () => false,
+      hasAnyRole: () => false,
+      hasAllRoles: () => false,
+      getRoleDisplayName: () => 'Unknown',
+      getRoleColor: () => '#6c757d'
     };
   }
 
-  const role = user.role;
+  const resolveRoles = (allowedRoles, { requireWorkspace = false } = {}) => {
+    if (!Array.isArray(allowedRoles) || allowedRoles.length === 0) return true;
+    if (requireWorkspace) {
+      return workspaceRole ? allowedRoles.includes(workspaceRole) : false;
+    }
+    const currentRole = workspaceRole || globalRole;
+    return currentRole ? allowedRoles.includes(currentRole) : false;
+  };
 
   return {
     // Role checks
-    isAdmin: role === 'ad',
+    isAdmin: !inWorkspaceContext && role === 'admin',
     isPM: role === 'pm',
     isTL: role === 'tl',
     isMember: role === 'mb',
+    isClient: role === 'clt',
 
-    // Basic permissions
-    canView: ['ad', 'pm', 'tl', 'mb'].includes(role),
-    canEdit: ['ad', 'pm', 'tl'].includes(role),
-    canManageMembers: ['ad', 'pm', 'tl'].includes(role),
-    canDelete: ['ad', 'pm', 'tl'].includes(role),
+    // Basic permissions (PM trong workspace có toàn quyền)
+    canView: resolveRoles(['pm', 'tl', 'mb', 'clt'], { requireWorkspace: inWorkspaceContext }),
+    canEdit: resolveRoles(inWorkspaceContext ? ['pm', 'tl'] : ['ad', 'pm', 'tl']),
+    canManageMembers: resolveRoles(inWorkspaceContext ? ['pm'] : ['ad', 'pm', 'tl']),
+    canDelete: resolveRoles(inWorkspaceContext ? ['pm'] : ['ad', 'pm', 'tl']),
 
     // Project permissions
-    canCreateProject: ['ad', 'pm', 'tl'].includes(role),
-    canEditProject: ['ad', 'pm', 'tl'].includes(role),
-    canDeleteProject: ['ad', 'pm', 'tl'].includes(role),
-    canViewProjects: ['ad', 'pm', 'tl', 'mb'].includes(role),
+    canCreateProject: resolveRoles(inWorkspaceContext ? ['pm', 'tl'] : ['ad', 'pm', 'tl']),
+    canEditProject: resolveRoles(inWorkspaceContext ? ['pm', 'tl'] : ['ad', 'pm', 'tl']),
+    canDeleteProject: resolveRoles(inWorkspaceContext ? ['pm'] : ['ad', 'pm']),
+    canViewProjects: resolveRoles(['pm', 'tl', 'mb', 'clt'], { requireWorkspace: inWorkspaceContext }),
 
     // Task permissions
-    canCreateTask: ['ad', 'pm', 'tl'].includes(role),
-    canEditTask: ['ad', 'pm', 'tl'].includes(role),
-    canDeleteTask: ['ad', 'pm', 'tl'].includes(role),
-    canViewTasks: ['ad', 'pm', 'tl', 'mb'].includes(role),
+    canCreateTask: resolveRoles(inWorkspaceContext ? ['pm', 'tl'] : ['ad', 'pm', 'tl']),
+    canEditTask: resolveRoles(inWorkspaceContext ? ['pm', 'tl'] : ['ad', 'pm', 'tl']),
+    canDeleteTask: resolveRoles(inWorkspaceContext ? ['pm'] : ['ad', 'pm', 'tl']),
+    canViewTasks: resolveRoles(['pm', 'tl', 'mb'], { requireWorkspace: inWorkspaceContext }),
 
     // Member permissions
-    canViewMembers: ['ad', 'pm', 'tl', 'mb'].includes(role),
-    canAddMembers: ['ad', 'pm', 'tl'].includes(role),
-    canRemoveMembers: ['ad', 'pm', 'tl'].includes(role),
-    canEditUserRole: role === 'ad',
+    canViewMembers: resolveRoles(['pm', 'tl', 'mb', 'clt'], { requireWorkspace: inWorkspaceContext }),
+    canAddMembers: resolveRoles(['pm'], { requireWorkspace: inWorkspaceContext }),
+    canRemoveMembers: resolveRoles(['pm'], { requireWorkspace: inWorkspaceContext }),
+    canEditUserRole: resolveRoles(['pm'], { requireWorkspace: inWorkspaceContext }),
 
     // Feature permissions
-    canViewReports: ['ad', 'pm', 'tl'].includes(role),
-    canViewNotifications: ['ad', 'pm', 'tl', 'mb'].includes(role),
-    canViewChat: ['ad', 'pm', 'tl', 'mb'].includes(role),
-    canViewMyTasks: ['ad', 'pm', 'tl', 'mb'].includes(role),
-    canViewTeam: ['ad', 'pm', 'tl'].includes(role),
+    canViewReports: resolveRoles(['pm', 'tl'], { requireWorkspace: inWorkspaceContext }),
+    canViewNotifications: resolveRoles(['pm', 'tl', 'mb', 'clt'], { requireWorkspace: inWorkspaceContext }),
+    canViewChat: resolveRoles(['pm', 'tl', 'mb', 'clt'], { requireWorkspace: inWorkspaceContext }),
+    canViewMyTasks: resolveRoles(['pm', 'tl', 'mb'], { requireWorkspace: inWorkspaceContext }),
+    canViewTeam: resolveRoles(['pm', 'tl'], { requireWorkspace: inWorkspaceContext }),
 
-    // Admin only features
-    canManageUsers: ['ad', 'pm'].includes(role),
-    canDeleteUsers: role === 'ad',
-    canViewAllUsers: ['ad', 'pm'].includes(role),
+    // Admin only features (global scope)
+    // canManageUsers: chỉ hoạt động khi không có workspace context (global scope)
+    // Trong workspace, PM có thể quản lý members thông qua canManageMembers
+    canManageUsers: !inWorkspaceContext && resolveRoles(['ad', 'pm']),
+    canDeleteUsers: !inWorkspaceContext && resolveRoles(['ad']),
+    canViewAllUsers: !inWorkspaceContext && resolveRoles(['ad', 'pm']),
+    
+    // Team page permissions - cho phép PM và TL trong workspace cũng có thể xem
+    // canViewTeam đã được định nghĩa ở trên với workspace support
 
     // Helper functions
-    hasRole: (roles) => {
-      if (Array.isArray(roles)) {
-        return roles.includes(role);
-      }
-      return role === roles;
-    },
-
-    hasAnyRole: (roles) => {
-      return roles.some(r => r === role);
-    },
-
-    hasAllRoles: (roles) => {
-      return roles.every(r => r === role);
-    },
+    hasRole: (roles) => resolveRoles(Array.isArray(roles) ? roles : [roles]),
+    hasAnyRole: (roles) => roles.some(roleName => resolveRoles([roleName])),
+    hasAllRoles: (roles) => roles.every(roleName => resolveRoles([roleName])),
 
     // Get role display name
     getRoleDisplayName: () => {
@@ -93,7 +108,8 @@ export const usePermissions = () => {
         'ad': 'Admin',
         'pm': 'Project Manager',
         'tl': 'Team Leader',
-        'mb': 'Member'
+        'mb': 'Member',
+        'clt': 'Client'
       };
       return roleNames[role] || 'Unknown';
     },
@@ -104,7 +120,8 @@ export const usePermissions = () => {
         'ad': '#dc3545', // Red
         'pm': '#007bff', // Blue
         'tl': '#28a745', // Green
-        'mb': '#6c757d'  // Gray
+        'mb': '#6c757d', // Gray
+        'clt': '#8a2be2' // Purple
       };
       return roleColors[role] || '#6c757d';
     }
