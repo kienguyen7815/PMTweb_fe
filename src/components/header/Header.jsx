@@ -42,10 +42,10 @@ const Header = () => {
         <div className="header-nav">
           <ul className="nav-list">
             <li className="nav-item">
-              <a href="/" className="nav-link">Home <i class="fa-solid fa-chevron-down"></i></a>
-              <a href="/" className="nav-link">About <i class="fa-solid fa-chevron-down"></i></a>
-              <a href="/" className="nav-link">Services <i class="fa-solid fa-chevron-down"></i></a>
-              <a href="/" className="nav-link">Contact <i class="fa-solid fa-chevron-down"></i></a>
+              <a href="/" className="nav-link">Home<i class="fa-solid fa-chevron-down"></i></a>
+              <a href="/about" className="nav-link">About<i class="fa-solid fa-chevron-down"></i></a>
+              <a href="/services" className="nav-link">Services<i class="fa-solid fa-chevron-down"></i></a>
+              <a href="/contact" className="nav-link">Contact<i class="fa-solid fa-chevron-down"></i></a>
             </li>
           </ul>
         </div>

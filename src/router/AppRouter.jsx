@@ -1,5 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
 import Home from '../pages/home/Home';
+import About from '../pages/about/About';
+import Services from '../pages/services/Services';
+import Contact from '../pages/contact/Contact';
 import NotFound from '../pages/notFound/NotFound';
 import Login from '../pages/auth/login/Login';
 import Register from '../pages/auth/register/Register';
@@ -21,6 +24,9 @@ const AppRouter = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/services" element={<Services />} />
+      <Route path="/contact" element={<Contact />} />
       
       {/* Dashboard - Chỉ Admin */}
       <Route path="/dashboard" element={
