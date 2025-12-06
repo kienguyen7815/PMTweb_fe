@@ -64,7 +64,7 @@ const InforLayout = () => {
 					</p>
 					<div className="hero-buttons">
 						<button className="btn_start" onClick={handleStartClick}>BẮT ĐẦU NGAY</button>
-						<button className="btn_learn">TÌM HIỂU THÊM</button>
+						<button className="btn_learn" onClick={() => navigate('/learn-more')}>TÌM HIỂU THÊM</button>
 					</div>
 				</div>
 
@@ -148,7 +148,7 @@ const InforLayout = () => {
 						</p>
 						<div className="cta-buttons">
 							<button className="btn_start" onClick={handleStartClick}>BẮT ĐẦU NGAY</button>
-							<button className="btn_learn">TÌM HIỂU THÊM</button>
+							<button className="btn_learn" onClick={() => navigate('/learn-more')}>TÌM HIỂU THÊM</button>
 						</div>
 					</div>
 				</div>

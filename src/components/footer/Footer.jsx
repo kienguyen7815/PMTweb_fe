@@ -42,16 +42,13 @@ const Footer = () => {
 						<h4 className="footer-heading">Hỗ Trợ</h4>
 						<ul className="footer-links">
 							<li>
-								<a href="/">Hướng Dẫn</a>
+								<a href="/learn-more">Hướng Dẫn</a>
 							</li>
 							<li>
-								<a href="/">FAQ</a>
+								<a href="/contact">Liên Hệ</a>
 							</li>
 							<li>
-								<a href="/">Liên Hệ</a>
-							</li>
-							<li>
-								<a href="/">Trợ Giúp</a>
+								<a href="/contact">Trợ Giúp</a>
 							</li>
 						</ul>
 					</div>
@@ -61,13 +58,13 @@ const Footer = () => {
 						<h4 className="footer-heading">Liên Hệ</h4>
 						<ul className="footer-links">
 							<li>
-								<a href="/">Facebook</a>
+								<a href="https://www.facebook.com/abc.abcxz/">Facebook</a>
 							</li>
 							<li>
-								<a href="/">Zalo</a>
+								<a href="https://zalo.me/0905731260">Zalo</a>
 							</li>
 							<li>
-								<a href="/">Instagram</a>
+								<a href="https://www.instagram.com/abc.abcxz/">Instagram</a>
 							</li>
 							<li>
 								<a href="/">WhatsApp</a>
@@ -78,7 +75,7 @@ const Footer = () => {
 
 				{/* Copyright */}
 				<div className="footer-copyright">
-					<p>Copyright ©2025 - Bản quyền thuộc về Nguyễn Văn Kiện</p>
+					<p>Copyright ©2025 - Bản quyền thuộc về Nguyễn Văn Kiện - キエン</p>
 				</div>
 			</footer>
 		</div>

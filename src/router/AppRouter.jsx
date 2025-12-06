@@ -3,6 +3,7 @@ import Home from '../pages/home/Home';
 import About from '../pages/about/About';
 import Services from '../pages/services/Services';
 import Contact from '../pages/contact/Contact';
+import LearnMore from '../pages/learnMore/LearnMore';
 import NotFound from '../pages/notFound/NotFound';
 import Login from '../pages/auth/login/Login';
 import Register from '../pages/auth/register/Register';
@@ -27,6 +28,7 @@ const AppRouter = () => {
       <Route path="/about" element={<About />} />
       <Route path="/services" element={<Services />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/learn-more" element={<LearnMore />} />
       
       {/* Dashboard - Chỉ Admin */}
       <Route path="/dashboard" element={
