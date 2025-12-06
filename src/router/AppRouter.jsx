@@ -20,6 +20,7 @@ import Profile from '../pages/profile/Profile';
 import AIChat from '../pages/aiChat/AIChat';
 import MainLayout from '../layouts/mainLayout/MainLayout';
 import Workspaces from '../pages/workspaces/Workspaces';
+import Admin from '../pages/admin/Admin';
 
 const AppRouter = () => {
   return (
@@ -30,7 +31,14 @@ const AppRouter = () => {
       <Route path="/contact" element={<Contact />} />
       <Route path="/learn-more" element={<LearnMore />} />
       
-      {/* Dashboard - Chỉ Admin */}
+      {/* Admin Panel - Chỉ Admin */}
+      <Route path="/admin" element={
+        <ProtectedRoute requireAdmin={true}>
+          <Admin />
+        </ProtectedRoute>
+      } />
+
+      {/* Dashboard - Chỉ Admin (deprecated, redirect to /admin) */}
       <Route path="/dashboard" element={
         <ProtectedRoute requireAdmin={true}>
           <Dashboard />
