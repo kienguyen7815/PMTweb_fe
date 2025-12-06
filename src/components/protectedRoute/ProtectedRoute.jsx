@@ -41,7 +41,7 @@ const ProtectedRoute = ({
   // Nếu không yêu cầu đăng nhập (login/register) nhưng đã đăng nhập -> chuyển vào trang chọn workspace
   if (!requireAuth && isAuthenticated) {
     // Admin global -> đưa vào dashboard, user thường -> workspaces
-    const target = globalRole === 'admin' ? '/dashboard' : '/workspaces';
+    const target = globalRole === 'admin' ? '/admin' : '/workspaces';
     return <Navigate to={target} replace />;
   }
 

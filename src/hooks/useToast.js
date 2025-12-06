@@ -16,7 +16,12 @@ const useToast = () => {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  return { toasts, addToast, removeToast };
+  return { 
+    toasts, 
+    addToast, 
+    removeToast,
+    showToast: addToast // Alias for compatibility
+  };
 };
 
 export default useToast;

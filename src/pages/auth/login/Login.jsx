@@ -44,10 +44,10 @@ const Login = () => {
     try {
       const res = await login(formData);
       
-      // Nếu là admin (global) -> chuyển thẳng vào dashboard
+      // Nếu là admin (global) -> chuyển thẳng vào admin panel
       const role = res?.data?.user?.role;
       if (role === 'admin') {
-        navigate('/dashboard', { replace: true });
+        navigate('/admin', { replace: true });
       } else {
         // User thường -> vào trang chọn workspace (hoặc trang đã yêu cầu trước đó)
         navigate(from, { replace: true });
