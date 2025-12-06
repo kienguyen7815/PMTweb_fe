@@ -5,6 +5,10 @@ const taskService = {
     const res = await api.get(`/tasks/project/${projectId}`);
     return res.data;
   },
+  getStatuses: async () => {
+    const res = await api.get('/tasks/statuses');
+    return res.data;
+  },
   get: async (id) => {
     const res = await api.get(`/tasks/${id}`);
     return res.data;
@@ -19,6 +23,10 @@ const taskService = {
   },
   updateProgress: async (id, progress) => {
     const res = await api.put(`/tasks/${id}/progress`, { progress });
+    return res.data;
+  },
+  updateStatus: async (id, status) => {
+    const res = await api.put(`/tasks/${id}/status`, { status });
     return res.data;
   },
   remove: async (id) => {

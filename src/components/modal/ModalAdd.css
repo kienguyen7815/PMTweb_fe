@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  z-index: 50;
+  z-index: 2000;
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -70,8 +70,8 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 24px 24px 16px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 16px 24px 16px 24px;
+  border-bottom: 2px solid #1c4d70;
 }
 
 .modal-header-text {
@@ -81,8 +81,8 @@
 
 .modal-title {
   font-size: 18px;
-  font-weight: 600;
-  color: #111827;
+  font-weight: 800;
+  color: #1c4d70;
   margin: 0 0 4px 0;
   line-height: 1.5;
 }
@@ -132,18 +132,17 @@
 }
 
 .modal-body::-webkit-scrollbar-track {
-  background: rgba(27, 26, 85, 0.2);
+  background: #c5dff2;
   border-radius: 4px;
 }
 
 .modal-body::-webkit-scrollbar-thumb {
-  background: rgba(146, 144, 195, 0.6);
+  background:#1c4d70; 
   border-radius: 4px;
+
 }
 
-.modal-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(146, 144, 195, 0.8);
-}
+
 
 /* Modal Footer */
 .modal-footer {
@@ -194,34 +193,31 @@
 
 /* Primary Button */
 .modal-action-btn.primary {
-  background: #070F2B;
+  background: #1d425d;
   color: #ffffff;
-  border-color: #070F2B;
 }
 
 .modal-action-btn.primary:hover:not(:disabled) {
-  background: #0a1538;
-  border-color: #0a1538;
+  background: #1d425d;
+  color: #ffffff;
 }
 
 .modal-action-btn.primary:active:not(:disabled) {
-  background: #050a1f;
+  background: #1d425d;
 }
 
 /* Secondary Button */
 .modal-action-btn.secondary {
-  background: #535C91;
-  color: #ffffff;
-  border-color: #535C91;
+  background: #93c5e6;
+  color: #ffff;
 }
 
 .modal-action-btn.secondary:hover:not(:disabled) {
-  background: #454a7a;
-  border-color: #454a7a;
+  background: #93c5e6;
 }
 
 .modal-action-btn.secondary:active:not(:disabled) {
-  background: #3a3f66;
+  background: #93c5e6;
 }
 
 /* Danger Button */
@@ -274,12 +270,13 @@
   width: 16px;
   text-align: center;
 }
-
+.modal-body .form-row input[type="number"],
 .modal-body .form-row input[type="text"],
 .modal-body .form-row input[type="date"],
 .modal-body .form-row input[type="email"],
 .modal-body .form-row textarea,
 .modal-content .project-form .form-row input[type="text"],
+modal-content .project-form .form-row input[type="number"],
 .modal-content .project-form .form-row input[type="date"],
 .modal-content .project-form .form-row input[type="email"],
 .modal-content .project-form .form-row textarea {
@@ -607,7 +604,7 @@
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background: #f3f4f6;
+  background: #c5dff2;
   border-radius: 20px;
   font-size: 13px;
   border: 1px solid #e5e7eb;
@@ -627,7 +624,7 @@
 }
 
 .chip-text {
-  color: #374151;
+  color: #1c4d70;
   font-weight: 500;
 }
 

@@ -1,38 +1,40 @@
-.teams-chat-page {
+.chat-chat-page {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background: #f3f2f1;
   overflow: hidden;
+  max-width: 1400px;
+  padding: 0 24px;
+  margin: auto;
+  height: 100%;
 }
 
-/* Top Header Bar */
-.teams-header {
+.chat-header {
+  margin-top: 20px;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
-  background: #ffffff;
-  border-bottom: 1px solid #e1dfdd;
+  border-bottom: 2px solid #1c4d70;
   height: 56px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   z-index: 100;
+  width: 1400px;
 }
 
-.teams-header-left {
+.chat-header-left {
   display: flex;
   align-items: center;
   min-width: 200px;
 }
 
-.teams-header-title {
+.chat-header-title {
   font-size: 20px;
   font-weight: 600;
   color: #323130;
   margin: 0;
 }
 
-.teams-header-center {
+.chat-header-center {
   flex: 1;
   display: flex;
   justify-content: center;
@@ -40,13 +42,13 @@
   margin: 0 auto;
 }
 
-.teams-search-box {
+.chat-search-box {
   position: relative;
   width: 100%;
   max-width: 500px;
 }
 
-.teams-search-box i {
+.chat-search-box i {
   position: absolute;
   left: 12px;
   top: 50%;
@@ -55,7 +57,7 @@
   font-size: 14px;
 }
 
-.teams-search-box input {
+.chat-search-box input {
   width: 100%;
   padding: 8px 12px 8px 36px;
   border: 1px solid #e1dfdd;
@@ -66,14 +68,14 @@
   transition: all 0.2s;
 }
 
-.teams-search-box input:focus {
+.chat-search-box input:focus {
   outline: none;
   background: #ffffff;
-  border-color: #070F2B;
-  box-shadow: 0 0 0 1px #070F2B;
+  border-color: #1c4d70;
+  box-shadow: 0 0 0 1px #1c4d70;
 }
 
-.teams-header-right {
+.chat-header-right {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -81,7 +83,7 @@
   justify-content: flex-end;
 }
 
-.teams-user-info {
+.chat-user-info {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -91,15 +93,15 @@
   transition: background 0.2s;
 }
 
-.teams-user-info:hover {
+.chat-user-info:hover {
   background: #f3f2f1;
 }
 
-.teams-user-avatar {
+.chat-user-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #070F2B;
+  background: #1c4d70;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -109,32 +111,32 @@
   overflow: hidden;
 }
 
-.teams-user-avatar img {
+.chat-user-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.teams-user-name {
+.chat-user-name {
   font-size: 14px;
   color: #323130;
   font-weight: 500;
 }
 
-.teams-user-info i {
+.chat-user-info i {
   font-size: 12px;
   color: #605e5c;
 }
 
 /* Main Content Layout */
-.teams-content {
+.chat-content {
   display: flex;
   flex: 1;
   overflow: hidden;
 }
 
 /* Left Sidebar */
-.teams-sidebar {
+.chat-sidebar {
   width: 320px;
   background: #ffffff;
   border-right: 1px solid #e1dfdd;
@@ -143,13 +145,13 @@
   overflow: hidden;
 }
 
-.teams-sidebar-search {
+.chat-sidebar-search {
   position: relative;
   padding: 12px;
   border-bottom: 1px solid #e1dfdd;
 }
 
-.teams-sidebar-search i {
+.chat-sidebar-search i {
   position: absolute;
   left: 24px;
   top: 50%;
@@ -158,29 +160,29 @@
   font-size: 14px;
 }
 
-.teams-sidebar-search input {
+.chat-sidebar-search input {
   width: 100%;
   padding: 8px 12px 8px 36px;
   border: 1px solid #e1dfdd;
   border-radius: 4px;
-  background: #f3f2f1;
+  background: #e5f0f9;
   font-size: 14px;
   color: #323130;
   transition: all 0.2s;
 }
 
-.teams-sidebar-search input:focus {
+.chat-sidebar-search input:focus {
   outline: none;
   background: #ffffff;
-  border-color: #070F2B;
+  border-color: #1c4d70;
 }
 
-.teams-sidebar-section {
+.chat-sidebar-section {
   padding: 12px;
   border-bottom: 1px solid #e1dfdd;
 }
 
-.teams-sidebar-section-header {
+.chat-sidebar-section-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -192,12 +194,12 @@
   letter-spacing: 0.5px;
 }
 
-.teams-sidebar-section-header i {
-  color: #070F2B;
+.chat-sidebar-section-header i {
+  color: #1c4d70;
   font-size: 14px;
 }
 
-.teams-project-select {
+.chat-project-select {
   width: 100%;
   padding: 8px 12px;
   border: 1px solid #e1dfdd;
@@ -209,17 +211,17 @@
   transition: all 0.2s;
 }
 
-.teams-project-select:hover {
-  border-color: #070F2B;
+.chat-project-select:hover {
+  border-color: #1c4d70;
 }
 
-.teams-project-select:focus {
+.chat-project-select:focus {
   outline: none;
-  border-color: #070F2B;
-  box-shadow: 0 0 0 1px #070F2B;
+  border-color: #1c4d70;
+  box-shadow: 0 0 0 1px #1c4d70;
 }
 
-.teams-chats-list {
+.chat-chats-list {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -227,7 +229,7 @@
 }
 
 
-.teams-chat-item {
+.chat-chat-item {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -237,20 +239,20 @@
   transition: background 0.2s;
 }
 
-.teams-chat-item:hover {
-  background: #f3f2f1;
+.chat-chat-item:hover {
+  background: #e5f0f9;
 }
 
-.teams-chat-item.active {
-  background: #edebe9;
-  border-left: 3px solid #070F2B;
+.chat-chat-item.active {
+  background: #e5f0f9;
+  border-left: 3px solid #1c4d70;
 }
 
-.teams-chat-avatar {
+.chat-chat-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #070F2B;
+  background: #1c4d70;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -259,12 +261,12 @@
   flex-shrink: 0;
 }
 
-.teams-chat-info {
+.chat-chat-info {
   flex: 1;
   min-width: 0;
 }
 
-.teams-chat-name {
+.chat-chat-name {
   font-size: 14px;
   font-weight: 600;
   color: #323130;
@@ -274,7 +276,7 @@
   white-space: nowrap;
 }
 
-.teams-chat-preview {
+.chat-chat-preview {
   font-size: 12px;
   color: #605e5c;
   overflow: hidden;
@@ -282,7 +284,7 @@
   white-space: nowrap;
 }
 
-.teams-empty-chats {
+.chat-empty-chats {
   padding: 20px;
   text-align: center;
   color: #605e5c;
@@ -290,7 +292,7 @@
 }
 
 /* Main Chat Area */
-.teams-main {
+.chat-main {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -299,7 +301,7 @@
 }
 
 /* Chat Header */
-.teams-chat-header {
+.chat-chat-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -309,17 +311,17 @@
   height: 64px;
 }
 
-.teams-chat-header-info {
+.chat-chat-header-info {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.teams-chat-header-avatar {
+.chat-chat-header-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #070F2B;
+  background: #1c4d70;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -327,25 +329,25 @@
   font-size: 18px;
 }
 
-.teams-chat-header-info h3 {
+.chat-chat-header-info h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
   color: #323130;
 }
 
-.teams-chat-header-info p {
+.chat-chat-header-info p {
   margin: 0;
   font-size: 13px;
   color: #605e5c;
 }
 
-.teams-chat-header-actions {
+.chat-chat-header-actions {
   display: flex;
   gap: 8px;
 }
 
-.teams-header-btn {
+.chat-header-btn {
   width: 36px;
   height: 36px;
   border: none;
@@ -359,29 +361,29 @@
   transition: all 0.2s;
 }
 
-.teams-header-btn:hover {
+.chat-header-btn:hover {
   background: #f3f2f1;
   color: #323130;
 }
 
 /* Messages Area */
-.teams-messages {
+.chat-messages {
   flex: 1;
   overflow-y: auto;
   padding: 24px;
-  background: #faf9f8;
+  background: #f3f8fc;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.teams-message-group {
+.chat-message-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.teams-date-divider {
+.chat-date-divider {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -389,43 +391,42 @@
   position: relative;
 }
 
-.teams-date-divider::before,
-.teams-date-divider::after {
+.chat-date-divider::before,
+.chat-date-divider::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: #e1dfdd;
+  background: #92c5e7;
 }
 
-.teams-date-divider span {
+.chat-date-divider span {
   padding: 0 16px;
   font-size: 12px;
-  color: #605e5c;
-  background: #faf9f8;
+  color: #92c5e7;
   font-weight: 500;
 }
 
-.teams-message {
+.chat-message {
   display: flex;
   gap: 12px;
   max-width: 70%;
   animation: messageIn 0.3s ease-out;
 }
 
-.teams-message.own {
+.chat-message.own {
   align-self: flex-end;
   flex-direction: row-reverse;
 }
 
-.teams-message.other {
+.chat-message.other {
   align-self: flex-start;
 }
 
-.teams-message-avatar {
+.chat-message-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #070F2B;
+  background: #1c4d70;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -436,24 +437,24 @@
   overflow: hidden;
 }
 
-.teams-message-avatar img {
+.chat-message-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.teams-message-content {
+.chat-message-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.teams-message.own .teams-message-content {
+.chat-message.own .chat-message-content {
   align-items: flex-end;
 }
 
-.teams-message-header {
+.chat-message-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -461,54 +462,56 @@
   margin-bottom: 2px;
 }
 
-.teams-message-author {
+.chat-message-author {
   font-weight: 600;
   color: #323130;
 }
 
-.teams-message-time {
+.chat-message-time {
   color: #605e5c;
   font-size: 11px;
 }
 
-.teams-message-bubble {
+.chat-message-bubble {
   padding: 8px 12px;
   border-radius: 4px;
   position: relative;
   display: flex;
-  align-items: flex-end;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   max-width: 100%;
 }
 
-.teams-message.own .teams-message-bubble {
-  background: #070F2B;
+.chat-message.own .chat-message-bubble {
+  background: #1c4d70;
   color: #ffffff;
   border-bottom-right-radius: 0;
 }
 
-.teams-message.other .teams-message-bubble {
+.chat-message.other .chat-message-bubble {
   background: #ffffff;
   color: #323130;
   border: 1px solid #e1dfdd;
   border-bottom-left-radius: 0;
 }
 
-.teams-message-text {
+.chat-message-text {
   font-size: 14px;
   line-height: 1.5;
   word-wrap: break-word;
-  flex: 1;
 }
 
-.teams-message-time-inline {
+.chat-message-time-inline {
   font-size: 11px;
   opacity: 0.8;
   white-space: nowrap;
-  flex-shrink: 0;
+  align-self: flex-end;
+  margin-top: 2px;
+  color: #92c5e7;
 }
 
-.teams-empty-messages {
+.chat-empty-messages {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -518,17 +521,17 @@
   gap: 16px;
 }
 
-.teams-empty-messages i {
+.chat-empty-messages i {
   font-size: 48px;
   opacity: 0.5;
 }
 
-.teams-empty-messages p {
+.chat-empty-messages p {
   font-size: 16px;
   margin: 0;
 }
 
-.teams-typing-indicator {
+.chat-typing-indicator {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -538,12 +541,12 @@
   font-style: italic;
 }
 
-.teams-typing-dots {
+.chat-typing-dots {
   display: flex;
   gap: 4px;
 }
 
-.teams-typing-dots span {
+.chat-typing-dots span {
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -551,48 +554,48 @@
   animation: typingDot 1.4s infinite;
 }
 
-.teams-typing-dots span:nth-child(2) {
+.chat-typing-dots span:nth-child(2) {
   animation-delay: 0.2s;
 }
 
-.teams-typing-dots span:nth-child(3) {
+.chat-typing-dots span:nth-child(3) {
   animation-delay: 0.4s;
 }
 
 /* Input Area */
-.teams-input-area {
+.chat-input-area {
   border-top: 1px solid #e1dfdd;
   background: #ffffff;
   padding: 12px 24px;
 }
 
-.teams-input-form {
+.chat-input-form {
   display: flex;
   align-items: flex-end;
   gap: 8px;
-  background: #f3f2f1;
+  background: #e5f0f9;
   border-radius: 20px;
   padding: 8px 12px;
   transition: all 0.2s;
 }
 
-.teams-input-form:focus-within {
+.chat-input-form:focus-within {
   background: #ffffff;
-  box-shadow: 0 0 0 1px #070F2B;
+  box-shadow: 0 0 0 1px #1c4d70;
 }
 
-.teams-input-toolbar {
+.chat-input-toolbar {
   display: flex;
   gap: 4px;
   align-items: center;
 }
 
-.teams-input-wrapper {
+.chat-input-wrapper {
   flex: 1;
   min-width: 0;
 }
 
-.teams-input {
+.chat-input {
   width: 100%;
   border: none;
   background: transparent;
@@ -603,17 +606,17 @@
   font-family: inherit;
 }
 
-.teams-input::placeholder {
+.chat-input::placeholder {
   color: #605e5c;
 }
 
-.teams-input-actions {
+.chat-input-actions {
   display: flex;
   gap: 4px;
   align-items: center;
 }
 
-.teams-toolbar-btn {
+.chat-toolbar-btn {
   width: 32px;
   height: 32px;
   border: none;
@@ -628,16 +631,16 @@
   font-size: 16px;
 }
 
-.teams-toolbar-btn:hover {
+.chat-toolbar-btn:hover {
   background: #e1dfdd;
   color: #323130;
 }
 
-.teams-send-btn {
+.chat-send-btn {
   width: 32px;
   height: 32px;
   border: none;
-  background: #070F2B;
+  background: #1c4d70;
   border-radius: 50%;
   color: #ffffff;
   cursor: pointer;
@@ -648,12 +651,12 @@
   font-size: 14px;
 }
 
-.teams-send-btn:hover:not(:disabled) {
+.chat-send-btn:hover:not(:disabled) {
   background: #106ebe;
   transform: scale(1.05);
 }
 
-.teams-send-btn:disabled {
+.chat-send-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -682,47 +685,47 @@
 }
 
 /* Scrollbar Styling */
-.teams-messages::-webkit-scrollbar,
-.teams-chats-list::-webkit-scrollbar {
+.chat-messages::-webkit-scrollbar,
+.chat-chats-list::-webkit-scrollbar {
   width: 8px;
 }
 
-.teams-messages::-webkit-scrollbar-track,
-.teams-chats-list::-webkit-scrollbar-track {
+.chat-messages::-webkit-scrollbar-track,
+.chat-chats-list::-webkit-scrollbar-track {
   background: rgba(27, 26, 85, 0.2);
   border-radius: 4px;
 }
 
-.teams-messages::-webkit-scrollbar-thumb,
-.teams-chats-list::-webkit-scrollbar-thumb {
+.chat-messages::-webkit-scrollbar-thumb,
+.chat-chats-list::-webkit-scrollbar-thumb {
   background: rgba(146, 144, 195, 0.6);
   border-radius: 4px;
 }
 
-.teams-messages::-webkit-scrollbar-thumb:hover,
-.teams-chats-list::-webkit-scrollbar-thumb:hover {
+.chat-messages::-webkit-scrollbar-thumb:hover,
+.chat-chats-list::-webkit-scrollbar-thumb:hover {
   background: rgba(146, 144, 195, 0.8);
 }
 
 
 /* Responsive */
 @media (max-width: 980px) {
-  .teams-content {
+  .chat-content {
     flex-direction: column;
   }
 
-  .teams-sidebar {
+  .chat-sidebar {
     width: 100%;
     max-height: 200px;
     border-right: none;
     border-bottom: 1px solid #e1dfdd;
   }
 
-  .teams-message {
+  .chat-message {
     max-width: 85%;
   }
 
-  .teams-header-center {
+  .chat-header-center {
     display: none;
   }
 }

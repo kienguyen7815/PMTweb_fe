@@ -301,7 +301,7 @@ const Projects = () => {
           <ModalAdd
             isOpen={isFormOpen}
             onClose={closeFormOnly}
-            title={editingId ? 'Chỉnh sửa dự án' : 'Tạo dự án'}
+            title={editingId ? 'CHỈNH SỬA DỰ ÁN' : 'TẠO DỰ ÁN'}
             subtitle={editingId ? 'Cập nhật thông tin dự án của bạn' : 'Thêm dự án mới vào hệ thống'}
             icon={editingId ? 'fa-edit' : 'fa-plus-circle'}
             actions={[
@@ -519,7 +519,6 @@ const Projects = () => {
           <div className="projects-list modern">
             {projects.map(p => (
               <div className="projects-item card" key={p.id}>
-                <div className="card-header-gradient"></div>
                 <div className="item-head">
                   <div className="item-title-wrapper">
                     <i className="fas fa-folder item-icon"></i>
@@ -610,7 +609,6 @@ const Projects = () => {
         <div className="projects-list modern">
           {projects.map(p => (
             <div className="projects-item card" key={p.id}>
-              <div className="card-header-gradient"></div>
               <div className="item-head">
                 <div className="item-title-wrapper">
                   <i className="fas fa-folder item-icon"></i>

@@ -1,11 +1,22 @@
 import "../inforLayout/InforLayout.css";
 import imgBgr from "../../assets/img/ai-5202865_1920.jpg";
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 const InforLayout = () => {
+	const navigate = useNavigate();
+	const { isAuthenticated } = useAuth();
 	const featuresSectionRef = useRef(null);
 	const isScrollingRef = useRef(false);
+
+	const handleStartClick = () => {
+		if (isAuthenticated) {
+			navigate('/projects');
+		} else {
+			navigate('/login');
+		}
+	};
 
 	useEffect(() => {
 		const handleScroll = (e) => {
@@ -52,9 +63,7 @@ const InforLayout = () => {
 						dõi tiến độ dự án một cách dễ dàng.
 					</p>
 					<div className="hero-buttons">
-						<Link to="/login">
-							<button className="btn_start">BẮT ĐẦU NGAY</button>
-						</Link>
+						<button className="btn_start" onClick={handleStartClick}>BẮT ĐẦU NGAY</button>
 						<button className="btn_learn">TÌM HIỂU THÊM</button>
 					</div>
 				</div>
@@ -138,9 +147,7 @@ const InforLayout = () => {
 							việc hiệu quả nhất cho nhóm freelancer của bạn.
 						</p>
 						<div className="cta-buttons">
-							<Link to="/login">
-								<button className="btn_start">BẮT ĐẦU NGAY</button>
-							</Link>
+							<button className="btn_start" onClick={handleStartClick}>BẮT ĐẦU NGAY</button>
 							<button className="btn_learn">TÌM HIỂU THÊM</button>
 						</div>
 					</div>

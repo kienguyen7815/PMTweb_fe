@@ -119,14 +119,24 @@ const authService = {
   // Upload avatar
   uploadAvatar: async (file) => {
     try {
+      // Validate file trước khi upload
+      if (!file) {
+        throw new Error('Không có file được chọn');
+      }
+
+      if (!file.type.startsWith('image/')) {
+        throw new Error('File phải là ảnh (jpeg, jpg, png, gif, webp)');
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('Kích thước file không được vượt quá 5MB');
+      }
+
       const formData = new FormData();
       formData.append('avatar', file);
 
-      const response = await api.post('/auth/profile/avatar', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      // Không set Content-Type, để axios tự động set với boundary cho FormData
+      const response = await api.post('/auth/profile/avatar', formData);
       
       if (response.data.success && response.data.data.user) {
         sessionStorage.setItem('user', JSON.stringify(response.data.data.user));
@@ -135,6 +145,7 @@ const authService = {
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error('Upload avatar error:', error);
+        console.error('Error response:', error.response?.data);
       }
       
       // Xử lý validation errors từ backend
@@ -143,7 +154,12 @@ const authService = {
         throw new Error(errorMessages);
       }
       
-      const errorMessage = error.response?.data?.message || error.message || 'Lỗi kết nối đến server';
+      // Xử lý multer errors
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      
+      const errorMessage = error.message || 'Lỗi kết nối đến server';
       throw new Error(errorMessage);
     }
   },

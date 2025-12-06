@@ -14,79 +14,106 @@ import Reports from '../pages/reports/Reports';
 import Chat from '../pages/chat/Chat';
 import Profile from '../pages/profile/Profile';
 import AIChat from '../pages/aiChat/AIChat';
+import MainLayout from '../layouts/mainLayout/MainLayout';
+import Workspaces from '../pages/workspaces/Workspaces';
 
 const AppRouter = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       
-      {/* Dashboard - Tất cả role đã đăng nhập */}
+      {/* Dashboard - Chỉ Admin */}
       <Route path="/dashboard" element={
-        <ProtectedRoute allowedRoles={['ad', 'pm', 'tl', 'mb']}>
+        <ProtectedRoute requireAdmin={true}>
           <Dashboard />
         </ProtectedRoute>
       } />
+
+      {/* Chọn / tạo không gian làm việc - layout riêng */}
+      <Route path="/workspaces" element={
+        <ProtectedRoute>
+          <Workspaces />
+        </ProtectedRoute>
+      } />
       
-      {/* Projects - Tất cả role có thể xem */}
+      {/* Main Layout Routes - Quản lý dự án */}
       <Route path="/projects" element={
-        <ProtectedRoute allowedRoles={['ad', 'pm', 'tl', 'mb']}>
-          <Projects />
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb', 'clt']} requireWorkspace={true}>
+          <MainLayout>
+            <Projects />
+          </MainLayout>
         </ProtectedRoute>
       } />
       
       {/* Tasks - Tất cả role có thể xem */}
       <Route path="/tasks" element={
-        <ProtectedRoute allowedRoles={['ad', 'pm', 'tl', 'mb']}>
-          <Tasks />
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb']} requireWorkspace={true}>
+          <MainLayout>
+            <Tasks />
+          </MainLayout>
         </ProtectedRoute>
       } />
       
       {/* My Tasks - Tất cả role */}
       <Route path="/my-tasks" element={
-        <ProtectedRoute allowedRoles={['ad', 'pm', 'tl', 'mb']}>
-          <MyTasks />
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb']} requireWorkspace={true}>
+          <MainLayout>
+            <MyTasks />
+          </MainLayout>
         </ProtectedRoute>
       } />
       
       {/* Team - Chỉ TL, PM, Admin */}
       <Route path="/team" element={
-        <ProtectedRoute requireLeaderOrAbove={true}>
-          <Team />
+        <ProtectedRoute requireLeaderOrAbove={true} requireWorkspace={true}>
+          <MainLayout>
+            <Team />
+          </MainLayout>
         </ProtectedRoute>
       } />
       
       {/* Notifications - Tất cả role */}
       <Route path="/notifications" element={
-        <ProtectedRoute allowedRoles={['ad', 'pm', 'tl', 'mb']}>
-          <Notifications />
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb', 'clt']} requireWorkspace={true}>
+          <MainLayout>
+            <Notifications />
+          </MainLayout>
         </ProtectedRoute>
       } />
       
       {/* Reports - Chỉ TL, PM, Admin */}
       <Route path="/reports" element={
-        <ProtectedRoute requireLeaderOrAbove={true}>
-          <Reports />
+        <ProtectedRoute requireLeaderOrAbove={true} requireWorkspace={true}>
+          <MainLayout>
+            <Reports />
+          </MainLayout>
         </ProtectedRoute>
       } />
       
       {/* Chat - Tất cả role */}
       <Route path="/chat" element={
-        <ProtectedRoute allowedRoles={['ad', 'pm', 'tl', 'mb']}>
-          <Chat />
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb', 'clt']} requireWorkspace={true}>
+          <MainLayout>
+            <Chat />
+          </MainLayout>
         </ProtectedRoute>
       } />
       
       {/* AI Chat - Tất cả role */}
       <Route path="/ai-chat" element={
-        <ProtectedRoute allowedRoles={['ad', 'pm', 'tl', 'mb']}>
-          <AIChat />
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb', 'clt']} requireWorkspace={true}>
+          <MainLayout>
+            <AIChat />
+          </MainLayout>
         </ProtectedRoute>
       } />
       
       {/* Profile - Tất cả role */}
       <Route path="/profile" element={
-        <ProtectedRoute allowedRoles={['ad', 'pm', 'tl', 'mb']}>
-          <Profile />
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb', 'clt']} requireWorkspace={true}>
+          <MainLayout>
+            <Profile />
+          </MainLayout>
         </ProtectedRoute>
       } />
       

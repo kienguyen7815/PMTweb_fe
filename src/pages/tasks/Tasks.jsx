@@ -18,10 +18,12 @@ import { formatDateForInput, formatDateForDisplay } from '../../utils/dateHelper
 import { getLastName } from '../../utils/nameHelper';
 import './Tasks.css';
 
+const DEFAULT_STATUS = 'In Progress';
+
 const emptyForm = {
   name: '',
   description: '',
-  status: 'To Do',
+  status: DEFAULT_STATUS,
   progress: 0,
   due_date: '',
 };
@@ -39,11 +41,7 @@ const Tasks = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [tasks, setTasks] = useState([]);
-  const [statuses, setStatuses] = useState([
-    { value: 'To Do', label: 'To Do' },
-    { value: 'In Progress', label: 'In Progress' },
-    { value: 'Done', label: 'Done' }
-  ]);
+  const [statuses, setStatuses] = useState([{ value: DEFAULT_STATUS, label: DEFAULT_STATUS }]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -62,9 +60,29 @@ const Tasks = () => {
   const [availableUsers, setAvailableUsers] = useState([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [assigningMember, setAssigningMember] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const socketRef = useRef(null);
   const commentsEndRefs = useRef({});
   const detailCommentInputRef = useRef(null);
+
+  useEffect(() => {
+    const fetchStatuses = async () => {
+      try {
+        const res = await taskService.getStatuses();
+        if (res.success && Array.isArray(res.data) && res.data.length) {
+          const options = res.data.map(status => ({ value: status, label: status }));
+          setStatuses(options);
+          setForm(prev => ({
+            ...prev,
+            status: res.data.includes(prev.status) ? prev.status : DEFAULT_STATUS
+          }));
+        }
+      } catch (err) {
+        addToast('Không thể tải danh sách trạng thái', 'danger');
+      }
+    };
+    fetchStatuses();
+  }, []);
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -177,7 +195,7 @@ const Tasks = () => {
         setForm({
           name: res.data.name || '',
           description: res.data.description || '',
-          status: res.data.status || 'To Do',
+          status: res.data.status || DEFAULT_STATUS,
           progress: res.data.progress || 0,
           due_date: formatDateForInput(res.data.due_date),
         });
@@ -494,6 +512,17 @@ const Tasks = () => {
   const selectedProject = projects.find(p => p.id === parseInt(selectedProjectId));
   const currentTaskComments = selectedTask ? taskComments[selectedTask.id] || [] : [];
 
+  // Filter tasks based on search query
+  const filteredTasks = tasks.filter(task => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      task.name?.toLowerCase().includes(query) ||
+      task.description?.toLowerCase().includes(query) ||
+      task.status?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="tasks-page">
       <ToastContainer toasts={toasts} onRemove={removeToast} />
@@ -504,6 +533,9 @@ const Tasks = () => {
         subtitle="Xem và quản lý các công việc trong dự án của bạn."
         badge={selectedProject ? `${tasks.length} công việc` : ''}
         badgeIcon="fa-tasks"
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Tìm kiếm công việc..."
         actions={canCreate ? [
           {
             label: 'Tạo công việc',
@@ -546,14 +578,21 @@ const Tasks = () => {
           <LoadingState message="Đang tải danh sách công việc..." />
         ) : (
           <div className="tasks-list modern">
-            {tasks.map(task => (
-              <div 
-                className="tasks-item card" 
-                key={task.id}
-                onClick={() => openDetailModal(task)}
-                style={{ cursor: 'pointer' }}
-              >
-                <div className="card-header-gradient"></div>
+            {filteredTasks.length === 0 && tasks.length > 0 ? (
+              <EmptyState
+                icon="fa-search"
+                title="Không tìm thấy công việc"
+                description={`Không có công việc nào khớp với từ khóa "${searchQuery}"`}
+              />
+            ) : (
+              filteredTasks.map(task => (
+                <div 
+                  className="tasks-item card" 
+                  key={task.id}
+                  onClick={() => openDetailModal(task)}
+                  style={{ cursor: 'pointer' }}
+                >
+  
                 <div className="item-head">
                   <div className="item-title-wrapper">
                     <i className="fas fa-tasks item-icon"></i>
@@ -608,7 +647,8 @@ const Tasks = () => {
                   </div>
                 )}
               </div>
-            ))}
+              ))
+            )}
             {tasks.length === 0 && (
               <EmptyState
                 icon="fa-tasks"

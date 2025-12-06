@@ -41,20 +41,6 @@
   border-color: #c7d2fe;
 }
 
-.mytasks-card:hover .card-header-gradient {
-  opacity: 1;
-}
-
-.card-header-gradient {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
 
 .mytasks-card-header {
   display: flex;

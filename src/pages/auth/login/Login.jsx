@@ -25,8 +25,8 @@ const Login = () => {
     }
   }, [error]);
   
-  // Lấy URL redirect từ state
-  const from = location.state?.from?.pathname || '/';
+  // Lấy URL redirect từ state, mặc định là /workspaces (cho user thường)
+  const from = location.state?.from?.pathname || '/workspaces';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -42,9 +42,16 @@ const Login = () => {
     setError('');
 
     try {
-      await login(formData);
-      // Đăng nhập thành công, chuyển hướng về trang trước đó hoặc home
-      navigate(from, { replace: true });
+      const res = await login(formData);
+      
+      // Nếu là admin (global) -> chuyển thẳng vào dashboard
+      const role = res?.data?.user?.role;
+      if (role === 'admin') {
+        navigate('/dashboard', { replace: true });
+      } else {
+        // User thường -> vào trang chọn workspace (hoặc trang đã yêu cầu trước đó)
+        navigate(from, { replace: true });
+      }
     } catch (error) {
       setError(error.message || 'Có lỗi xảy ra khi đăng nhập');
     } finally {

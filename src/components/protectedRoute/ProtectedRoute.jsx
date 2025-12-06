@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
 
 const ProtectedRoute = ({ 
   children, 
@@ -8,9 +9,14 @@ const ProtectedRoute = ({
   allowedRoles = [], 
   requireAdmin = false,
   requirePMOrAdmin = false,
-  requireLeaderOrAbove = false 
+  requireLeaderOrAbove = false,
+  requireWorkspace = false
 }) => {
   const { isAuthenticated, loading, user } = useAuth();
+  const { currentWorkspace } = useWorkspace();
+  const workspaceRole = currentWorkspace?.role || null;
+  // Chuẩn hóa global role về lowercase để tránh lệ thuộc vào chữ hoa/thường
+  const globalRole = user?.role ? String(user.role).toLowerCase() : null;
   const location = useLocation();
 
   // Hiển thị loading khi đang kiểm tra authentication
@@ -32,16 +38,39 @@ const ProtectedRoute = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Nếu không yêu cầu đăng nhập (login/register) nhưng đã đăng nhập -> chuyển vào trang chọn workspace
   if (!requireAuth && isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    // Admin global -> đưa vào dashboard, user thường -> workspaces
+    const target = globalRole === 'admin' ? '/dashboard' : '/workspaces';
+    return <Navigate to={target} replace />;
   }
 
-  // Kiểm tra quyền truy cập dựa trên role
-  if (isAuthenticated && user) {
-    const userRole = user.role;
+  // Với các route yêu cầu phải chọn workspace
+  if (requireWorkspace && isAuthenticated && !currentWorkspace) {
+    return <Navigate to="/workspaces" state={{ from: location }} replace />;
+  }
 
-    // Kiểm tra quyền Admin
-    if (requireAdmin && userRole !== 'ad') {
+  const getRoleForCheck = (options = {}) => {
+    if (options.globalOnly) {
+      return globalRole;
+    }
+    if (options.forceWorkspace) {
+      return workspaceRole;
+    }
+    return workspaceRole || globalRole;
+  };
+
+  const roleMatches = (roles, options = {}) => {
+    if (!roles || roles.length === 0) return true;
+    const role = getRoleForCheck(options);
+    if (!role) return false;
+    return roles.includes(role);
+  };
+
+  // Kiểm tra quyền truy cập dựa trên role (ưu tiên role trong workspace)
+  if (isAuthenticated) {
+    // Kiểm tra quyền Admin (global)
+    if (requireAdmin && globalRole !== 'admin') {
       return (
         <div style={{ 
           display: 'flex', 
@@ -57,39 +86,46 @@ const ProtectedRoute = ({
     }
 
     // Kiểm tra quyền PM hoặc Admin
-    if (requirePMOrAdmin && !['ad', 'pm'].includes(userRole)) {
-      return (
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '100vh',
-          fontSize: '18px',
-          color: 'red'
-        }}>
-          Bạn không có quyền truy cập trang này. Chỉ Project Manager hoặc Admin mới có quyền.
-        </div>
-      );
+    if (requirePMOrAdmin) {
+      const hasWorkspacePM = workspaceRole === 'pm';
+      const hasGlobalAdmin = globalRole === 'admin';
+      const hasGlobalPM = !workspaceRole && globalRole === 'pm';
+      if (!(hasWorkspacePM || hasGlobalAdmin || hasGlobalPM)) {
+        return (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            height: '100vh',
+            fontSize: '18px',
+            color: 'red'
+          }}>
+            Bạn không có quyền truy cập trang này. Chỉ Project Manager hoặc Admin mới có quyền.
+          </div>
+        );
+      }
     }
 
-    // Kiểm tra quyền Team Leader trở lên
-    if (requireLeaderOrAbove && !['ad', 'pm', 'tl'].includes(userRole)) {
-      return (
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '100vh',
-          fontSize: '18px',
-          color: 'red'
-        }}>
-          Bạn không có quyền truy cập trang này. Chỉ Team Leader, Project Manager hoặc Admin mới có quyền.
-        </div>
-      );
+    // Kiểm tra quyền Team Leader trở lên (ưu tiên workspace role)
+    if (requireLeaderOrAbove) {
+      if (!roleMatches(['pm', 'tl'], { forceWorkspace: requireWorkspace })) {
+        return (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            height: '100vh',
+            fontSize: '18px',
+            color: 'red'
+          }}>
+            Bạn không có quyền truy cập trang này. Chỉ Team Leader hoặc Project Manager mới có quyền.
+          </div>
+        );
+      }
     }
 
     // Kiểm tra danh sách role được phép
-    if (allowedRoles.length > 0 && !allowedRoles.includes(userRole)) {
+    if (allowedRoles.length > 0 && !roleMatches(allowedRoles, { forceWorkspace: requireWorkspace })) {
       return (
         <div style={{ 
           display: 'flex', 
