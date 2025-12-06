@@ -1,15 +1,123 @@
 import { Routes, Route } from 'react-router-dom';
-import Home from '../pages/Home';
+import Home from '../pages/home/Home';
 import NotFound from '../pages/notFound/NotFound';
 import Login from '../pages/auth/login/Login';
 import Register from '../pages/auth/register/Register';
-import ProtectedRoute from '../components/ProtectedRoute';
+import ProtectedRoute from '../components/protectedRoute/ProtectedRoute';
+import Dashboard from '../pages/dashboard/Dashboard';
+import Projects from '../pages/projects/Projects';
+import Tasks from '../pages/tasks/Tasks';
+import MyTasks from '../pages/myTasks/MyTasks';
+import Team from '../pages/team/Team';
+import Notifications from '../pages/notifications/Notifications';
+import Reports from '../pages/reports/Reports';
+import Chat from '../pages/chat/Chat';
+import Profile from '../pages/profile/Profile';
+import AIChat from '../pages/aiChat/AIChat';
+import MainLayout from '../layouts/mainLayout/MainLayout';
+import Workspaces from '../pages/workspaces/Workspaces';
 
 const AppRouter = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="*" element={<NotFound />} />
+      
+      {/* Dashboard - Chỉ Admin */}
+      <Route path="/dashboard" element={
+        <ProtectedRoute requireAdmin={true}>
+          <Dashboard />
+        </ProtectedRoute>
+      } />
+
+      {/* Chọn / tạo không gian làm việc - layout riêng */}
+      <Route path="/workspaces" element={
+        <ProtectedRoute>
+          <Workspaces />
+        </ProtectedRoute>
+      } />
+      
+      {/* Main Layout Routes - Quản lý dự án */}
+      <Route path="/projects" element={
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb', 'clt']} requireWorkspace={true}>
+          <MainLayout>
+            <Projects />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      {/* Tasks - Tất cả role có thể xem */}
+      <Route path="/tasks" element={
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb']} requireWorkspace={true}>
+          <MainLayout>
+            <Tasks />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      {/* My Tasks - Tất cả role */}
+      <Route path="/my-tasks" element={
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb']} requireWorkspace={true}>
+          <MainLayout>
+            <MyTasks />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      {/* Team - Chỉ TL, PM, Admin */}
+      <Route path="/team" element={
+        <ProtectedRoute requireLeaderOrAbove={true} requireWorkspace={true}>
+          <MainLayout>
+            <Team />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      {/* Notifications - Tất cả role */}
+      <Route path="/notifications" element={
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb', 'clt']} requireWorkspace={true}>
+          <MainLayout>
+            <Notifications />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      {/* Reports - Chỉ TL, PM, Admin */}
+      <Route path="/reports" element={
+        <ProtectedRoute requireLeaderOrAbove={true} requireWorkspace={true}>
+          <MainLayout>
+            <Reports />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      {/* Chat - Tất cả role */}
+      <Route path="/chat" element={
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb', 'clt']} requireWorkspace={true}>
+          <MainLayout>
+            <Chat />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      {/* AI Chat - Tất cả role */}
+      <Route path="/ai-chat" element={
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb', 'clt']} requireWorkspace={true}>
+          <MainLayout>
+            <AIChat />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      {/* Profile - Tất cả role */}
+      <Route path="/profile" element={
+        <ProtectedRoute allowedRoles={['pm', 'tl', 'mb', 'clt']} requireWorkspace={true}>
+          <MainLayout>
+            <Profile />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      {/* Auth routes - Không cần đăng nhập */}
       <Route path="/login" element={
         <ProtectedRoute requireAuth={false}>
           <Login />
@@ -20,6 +128,9 @@ const AppRouter = () => {
           <Register />
         </ProtectedRoute>
       } />
+      
+      {/* 404 */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
