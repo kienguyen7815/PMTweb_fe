@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect} from 'react';
 import authService from '../services/authService';
 import { disconnectSocket } from '../services/socketService';
 
-// Singleton để tránh duplicate initialization
+// Tránh khởi tạo nhiều lần khi component re-render
 let authInitialized = false;
 
 const AuthContext = createContext();
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Chỉ initialize một lần duy nhất
+    // Chỉ chạy logic auth một lần duy nhất
     if (authInitialized) {
       setLoading(false);
       return;
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
     
     let isMounted = true;
     
-    // Kiểm tra token khi app khởi động
+    // Restore session nếu có token hợp lệ trong sessionStorage
     const initAuth = async () => {
       try {
         const token = sessionStorage.getItem('token');
@@ -37,13 +37,13 @@ export const AuthProvider = ({ children }) => {
           if (process.env.NODE_ENV === 'development') {
             console.log('Initializing auth with token...');
           }
-          // Kiểm tra token có hợp lệ không bằng cách gọi API profile
+          // Xác minh token vẫn còn hiệu lực bằng cách gọi API
           const response = await authService.getProfile();
           if (response.success && isMounted) {
             setUser(response.data.user);
             setIsAuthenticated(true);
           } else if (isMounted) {
-            // Token không hợp lệ, xóa khỏi sessionStorage
+            // Token đã hết hạn hoặc không hợp lệ
             authService.logout();
           }
         }
@@ -57,18 +57,18 @@ export const AuthProvider = ({ children }) => {
       } finally {
         if (isMounted) {
           setLoading(false);
-          authInitialized = true; // Đánh dấu đã initialize
+          authInitialized = true;
         }
       }
     };
 
     initAuth();
     
-    // Cleanup function
+    // Cleanup để tránh memory leak
     return () => {
       isMounted = false;
     };
-  }, []); // Empty dependency array để chỉ chạy một lần
+  }, []);
 
   const login = async (credentials) => {
     try {
@@ -99,15 +99,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    // Xóa thông tin xác thực trên client
+    // Xóa token và thông tin user khỏi session
     authService.logout();
 
-    // Đảm bảo đóng kết nối socket hiện tại (nếu có)
+    // Đóng kết nối WebSocket để tránh rò rỉ bộ nhớ
     disconnectSocket();
 
     setUser(null);
     setIsAuthenticated(false);
-    authInitialized = false; // Reset flag để có thể initialize lại
+    authInitialized = false;
   };
 
   const updateProfile = async (userData) => {

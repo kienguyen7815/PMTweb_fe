@@ -19,7 +19,7 @@ export const WorkspaceProvider = ({ children }) => {
   const [currentWorkspace, setCurrentWorkspace] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Load danh sách workspace của user sau khi đăng nhập
+  // Tải danh sách workspace khi user đăng nhập thành công
   useEffect(() => {
     const load = async () => {
       if (!isAuthenticated) {
@@ -35,7 +35,7 @@ export const WorkspaceProvider = ({ children }) => {
           const list = res.data || [];
           setWorkspaces(list);
 
-          // Lấy workspace đang chọn từ localStorage nếu còn tồn tại
+          // Tự động chọn workspace đã lưu hoặc workspace đầu tiên
           const savedId = localStorage.getItem('currentWorkspaceId');
           const saved = list.find(ws => String(ws.id) === savedId);
 
@@ -65,7 +65,7 @@ export const WorkspaceProvider = ({ children }) => {
     if (!workspace) {
       setCurrentWorkspace(null);
       localStorage.removeItem('currentWorkspaceId');
-      // Disconnect socket khi không có workspace
+      // Ngắt kết nối socket khi rời khỏi workspace
       disconnectSocket();
       return;
     }
@@ -76,10 +76,10 @@ export const WorkspaceProvider = ({ children }) => {
     setCurrentWorkspace(workspace);
     localStorage.setItem('currentWorkspaceId', String(workspace.id));
     
-    // Nếu workspace thay đổi, disconnect socket để reconnect với workspace_id mới
+    // Socket cần reconnect với role mới khi đổi workspace
     if (previousWorkspaceId !== newWorkspaceId) {
       disconnectSocket();
-      // Socket sẽ tự động reconnect khi được gọi lại với workspace_id mới
+      // Socket sẽ tự kết nối lại với workspace_id mới khi được sử dụng
     }
   };
 
