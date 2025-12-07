@@ -3,7 +3,7 @@ import Footer from '../../components/footer/Footer'
 import './LearnMore.css'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import imgBgr from '../../assets/img/laptop-6966045_1920.jpg'
+import imgBgr from '../../assets/img/ai-5202865_1920.jpg'
 
 const LearnMore = () => {
   const navigate = useNavigate()
@@ -30,7 +30,7 @@ const LearnMore = () => {
         {/* Hero Section */}
         <section className="learn-hero">
           <div className="learn-hero-content">
-            <h1 className="learn-title">TaskHub - Quản Lý Dự Án Thông Minh</h1>
+            <p className="learn-title">TaskHub - Quản Lý Dự Án Thông Minh</p>
             <p className="learn-subtitle">
               Giải pháp toàn diện cho các nhóm freelancer và doanh nghiệp
             </p>
