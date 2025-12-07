@@ -6,9 +6,6 @@
   z-index: 1000;
   height: 80px;
   transition: transform 0.3s ease-in-out;
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .header-hidden {

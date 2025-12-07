@@ -2,7 +2,7 @@ import Header from '../../components/header/Header'
 import Footer from '../../components/footer/Footer'
 import './Contact.css'
 import { useState } from 'react'
-import imgBgr from '../../assets/img/laptop-6966045_1920.jpg'
+import imgBgr from '../../assets/img/ai-5202865_1920.jpg'
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -54,7 +54,7 @@ const Contact = () => {
         {/* Hero Section */}
         <section className="contact-hero">
           <div className="contact-hero-content">
-            <h1 className="contact-title">Liên Hệ Với Chúng Tôi</h1>
+            <p className="contact-title">Liên Hệ Với Chúng Tôi</p>
             <p className="contact-subtitle">
               Chúng tôi luôn sẵn sàng hỗ trợ bạn. Hãy để lại thông tin, chúng tôi sẽ phản hồi sớm nhất!
             </p>
@@ -81,9 +81,8 @@ const Contact = () => {
                     <div className="method-content">
                       <h3 className="method-title">Địa Chỉ</h3>
                       <p className="method-text">
-                        Tầng 5, Tòa nhà ABC<br />
-                        123 Đường Lê Lợi, Quận 1<br />
-                        TP. Hồ Chí Minh, Việt Nam
+                        02 Đường Hòa An 10, phường An Khuê<br />
+                        TP. Đà Nẵng, Việt Nam
                       </p>
                     </div>
                   </div>
@@ -95,8 +94,8 @@ const Contact = () => {
                     <div className="method-content">
                       <h3 className="method-title">Điện Thoại</h3>
                       <p className="method-text">
-                        Hotline: +84 123 456 789<br />
-                        Support: +84 987 654 321<br />
+                        Hotline: +84 905 731 260<br />
+                        Support: +84 905 731 260<br />
                         (8:00 - 22:00 mỗi ngày)
                       </p>
                     </div>
@@ -109,9 +108,7 @@ const Contact = () => {
                     <div className="method-content">
                       <h3 className="method-title">Email</h3>
                       <p className="method-text">
-                        Support: support@taskhub.vn<br />
-                        Sales: sales@taskhub.vn<br />
-                        Info: info@taskhub.vn
+                        Info: 19102003kien@gmail.com
                       </p>
                     </div>
                   </div>
@@ -193,7 +190,7 @@ const Contact = () => {
                             id="email"
                             name="email"
                             className="form-input"
-                            placeholder="example@email.com"
+                            placeholder="example@gmail.com"
                             value={formData.email}
                             onChange={handleChange}
                             required
@@ -318,7 +315,7 @@ const Contact = () => {
           <div className="map-container">
             <iframe
               title="TaskHub Location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4608544063145!2d106.69530391533419!3d10.77592899230068!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f4b3330bcc9%3A0xb30871a7c8db8e5a!2zMTIzIMSQxrDhu51uZyBMw6ogTOG7o2ksIFF1YW4gMSwgVHAuIEhDTQ!5e0!3m2!1svi!2s!4v1234567890123!5m2!1svi!2s"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3834.144967111796!2d108.17492627416863!3d16.057965384619912!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3142191abe321c91%3A0x6bb1db7fe9abc543!2zSMOyYSBBbiAxMCwgSMOyYSBBbiwgQ-G6qW0gTOG7hywgxJDDoCBO4bq1bmcgNTUwMDAwLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1765074897252!5m2!1svi!2s"
               width="100%"
               height="450"
               style={{ border: 0 }}

@@ -64,7 +64,7 @@ const Footer = () => {
 								<a href="https://zalo.me/0905731260">Zalo</a>
 							</li>
 							<li>
-								<a href="https://www.instagram.com/abc.abcxz/">Instagram</a>
+								<a href="https://www.instagram.com/_n.v.k.03/">Instagram</a>
 							</li>
 							<li>
 								<a href="/">WhatsApp</a>

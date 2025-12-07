@@ -1,7 +1,7 @@
 import Header from '../../components/header/Header'
 import Footer from '../../components/footer/Footer'
 import './Services.css'
-import imgBgr from '../../assets/img/laptop-6966045_1920.jpg'
+import imgBgr from '../../assets/img/ai-5202865_1920.jpg'
 
 const Services = () => {
   return (
@@ -17,7 +17,7 @@ const Services = () => {
         {/* Hero Section */}
         <section className="services-hero">
           <div className="services-hero-content">
-            <h1 className="services-title">Dịch Vụ Của Chúng Tôi</h1>
+            <p className="services-title">Dịch Vụ Của Chúng Tôi</p>
             <p className="services-subtitle">
               Giải pháp toàn diện cho quản lý dự án và cộng tác nhóm hiệu quả
             </p>
