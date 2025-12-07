@@ -2,6 +2,7 @@ import Header from '../../components/header/Header'
 import Footer from '../../components/footer/Footer'
 import './Contact.css'
 import { useState } from 'react'
+import imgBgr from '../../assets/img/laptop-6966045_1920.jpg'
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -42,6 +43,11 @@ const Contact = () => {
 
   return (
     <div className="container">
+      {/* Background Image */}
+      <div className="page-bgr">
+        <img src={imgBgr} alt="background"/>
+      </div>
+
       <Header />
       
       <div className="contact-page">

@@ -31,26 +31,3 @@
   transform: translateY(-4px);
 }
 
-/* Styles cho buttons khi header ở nền sáng */
-.header-light-bg .btn-pale {
-  background: #fff;
-  color: #667eea;
-  border: 2px solid #667eea;
-}
-
-.header-light-bg .btn-pale:hover {
-  background: #667eea;
-  color: #fff;
-  border: 2px solid #667eea;
-}
-
-.header-light-bg .btn-bold {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  border: none;
-}
-
-.header-light-bg .btn-bold:hover {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-}

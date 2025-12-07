@@ -5,19 +5,14 @@
   right: 0;
   z-index: 1000;
   height: 80px;
-  transition: transform 0.3s ease-in-out, background-color 0.3s ease;
-  background-color: transparent;
+  transition: transform 0.3s ease-in-out;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .header-hidden {
   transform: translateY(-100%);
-}
-
-/* Khi header ở trên nền sáng/trắng */
-.header-light-bg {
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .header-container {
@@ -46,12 +41,6 @@
     transition: color 0.3s ease;
   }
 }
-
-/* Màu logo khi ở nền sáng */
-.header-light-bg .logo-text {
-  color: #000;
-}
-
 
 .header-nav {
   flex: 1;
@@ -91,15 +80,6 @@
   font-size: 0.75em;
 }
 
-/* Màu nav link khi ở nền sáng */
-.header-light-bg .nav-link {
-  color: #333;
-}
-
-.header-light-bg .nav-link:hover {
-  border-bottom: 2px solid black;
-}
-
 .header-right {
   display: flex;
   align-items: center;
@@ -109,12 +89,6 @@
 .user-greeting {
   color: #fff;
   font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-/* Màu chữ greeting khi ở nền sáng */
-.header-light-bg .user-greeting {
-  color: #000;
 }
 
 /* Responsive */
