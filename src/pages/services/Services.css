@@ -1,7 +1,8 @@
 .services-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
 }
+
 
 /* Hero Section */
 .services-hero {
@@ -332,7 +333,7 @@
 
 .btn-primary {
   background: #fff;
-  color: #667eea;
+  color: #000;
 }
 
 .btn-primary:hover {

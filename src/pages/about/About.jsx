@@ -1,6 +1,7 @@
 import Header from '../../components/header/Header'
 import Footer from '../../components/footer/Footer'
 import './About.css'
+import imgBgr from '../../assets/img/ai-5202865_1920.jpg'
 
 const About = () => {
   return (
@@ -11,7 +12,7 @@ const About = () => {
         {/* Hero Section */}
         <section className="about-hero">
           <div className="about-hero-content">
-            <h1 className="about-title">Về Task Hub</h1>
+            <p className="about-title">Về Task Hub</p>
             <p className="about-subtitle">
               Nền tảng quản lý dự án thông minh, giúp đội ngũ của bạn làm việc hiệu quả hơn
             </p>

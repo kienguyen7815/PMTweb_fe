@@ -140,7 +140,7 @@ const WorkspaceMonitoring = () => {
                                     width: '48px', 
                                     height: '48px', 
                                     borderRadius: '12px', 
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    background: '#1c4e70',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -180,7 +180,7 @@ const WorkspaceMonitoring = () => {
 
                             <div style={{ display: 'flex', gap: '16px', marginBottom: '12px' }}>
                                 <div>
-                                    <div style={{ fontSize: '20px', fontWeight: 700, color: '#3b82f6' }}>
+                                    <div style={{ fontSize: '20px', fontWeight: 700, color: '#1c4e70' }}>
                                         {workspace.members_count}
                                     </div>
                                     <div style={{ fontSize: '11px', color: '#64748b' }}>Members</div>

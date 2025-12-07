@@ -1,6 +1,7 @@
 .about-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-image: url(../../assets/img/ai-5202865_1920.jpg);
+  background-repeat: no-repeat;
 }
 
 /* Hero Section */
@@ -18,7 +19,7 @@
 .about-title {
   font-size: 3.5rem;
   font-weight: 700;
-  color: #fff;
+  color: #fff !important;
   margin-bottom: 20px;
   animation: fadeInUp 0.8s ease-out;
 }
@@ -141,13 +142,13 @@
   width: 80px;
   height: 80px;
   margin: 0 auto 25px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #fff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2.5rem;
-  color: #fff;
+  color: #000;
 }
 
 .value-title {
@@ -189,13 +190,13 @@
   width: 120px;
   height: 120px;
   margin: 0 auto 25px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #fff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 3rem;
-  color: #fff;
+  color: #000;
 }
 
 .team-name {
@@ -253,7 +254,7 @@
 
 .btn-primary {
   background: #fff;
-  color: #667eea;
+  color: #000;
 }
 
 .btn-primary:hover {
@@ -342,4 +343,5 @@
     max-width: 300px;
   }
 }
+
 

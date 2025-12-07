@@ -58,7 +58,6 @@ const AdminLayout = ({ children, currentView, setCurrentView }) => {
                     <img src={LogoDash} alt="logo" className="admin-brand-logo" />
                     <div>
                         <h2>TASK HUB</h2>
-                        <div className="admin-brand-subtitle">Admin Panel</div>
                     </div>
                 </div>
 

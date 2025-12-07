@@ -7,7 +7,7 @@
 /* ========== SIDEBAR ========== */
 .admin-sidebar {
   width: 280px;
-  background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+  background: #132a3e;
   color: white;
   display: flex;
   flex-direction: column;
@@ -39,11 +39,6 @@
   color: white;
 }
 
-.admin-brand-subtitle {
-  font-size: 11px;
-  opacity: 0.7;
-  margin-top: 2px;
-}
 
 .admin-user-box {
   padding: 20px;
