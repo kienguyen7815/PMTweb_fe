@@ -136,6 +136,19 @@ const Reports = () => {
   const [userActivity, setUserActivity] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Status icons mapping
+  const statusIcons = {
+    'Not Started': { icon: 'fa-pause-circle', color: '#94a3b8' },
+    'In Progress': { icon: 'fa-spinner', color: '#3b82f6' },
+    'Completed': { icon: 'fa-check-circle', color: '#22c55e' },
+    'Pending': { icon: 'fa-clock', color: '#f59e0b' },
+    'Planned': { icon: 'fa-calendar-alt', color: '#8b5cf6' },
+    'Cancelled': { icon: 'fa-times-circle', color: '#ef4444' },
+    'Testing': { icon: 'fa-flask', color: '#14b8a6' },
+    'In Review': { icon: 'fa-search', color: '#06b6d4' },
+    'Delayed': { icon: 'fa-exclamation-triangle', color: '#f97316' }
+  };
+
   useEffect(() => {
     if (canView) {
       loadReports();
@@ -265,27 +278,23 @@ const Reports = () => {
                     </span>
                     <span className="stat-value">{taskStats.total || 0}</span>
                   </div>
-                  <div className="stat-item">
-                    <span className="stat-label">
-                      <i className="fas fa-clipboard-list" style={{marginRight: '8px', color: '#f59e0b'}}></i>
-                      To Do
-                    </span>
-                    <span className="stat-value">{taskStats.to_do || 0}</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-label">
-                      <i className="fas fa-hourglass-half" style={{marginRight: '8px', color: '#3b82f6'}}></i>
-                      In Progress
-                    </span>
-                    <span className="stat-value">{taskStats.in_progress || 0}</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-label">
-                      <i className="fas fa-check-double" style={{marginRight: '8px', color: '#22c55e'}}></i>
-                      Done
-                    </span>
-                    <span className="stat-value">{taskStats.done || 0}</span>
-                  </div>
+                  
+                  {/* Dynamically render all statuses */}
+                  {taskStats.statuses && taskStats.statuses.map((status) => {
+                    const statusConfig = statusIcons[status] || { icon: 'fa-circle', color: '#64748b' };
+                    const count = taskStats[status] || 0;
+                    
+                    return (
+                      <div className="stat-item" key={status}>
+                        <span className="stat-label">
+                          <i className={`fas ${statusConfig.icon}`} style={{marginRight: '8px', color: statusConfig.color}}></i>
+                          {status}
+                        </span>
+                        <span className="stat-value">{count}</span>
+                      </div>
+                    );
+                  })}
+                  
                   <div className="stat-item">
                     <span className="stat-label">
                       <i className="fas fa-chart-line" style={{marginRight: '8px', color: '#8b5cf6'}}></i>
@@ -309,13 +318,13 @@ const Reports = () => {
             {taskStats && (
               <>
                 <PieChart 
-                  title="⏳ Tasks đang làm" 
-                  value={parseInt(taskStats.in_progress) || 0} 
+                  title="⏳ Tasks đang thực hiện" 
+                  value={parseInt(taskStats['In Progress']) || 0} 
                   total={parseInt(taskStats.total) || 1} 
                 />
                 <PieChart 
                   title="🎯 Tasks hoàn thành" 
-                  value={parseInt(taskStats.done) || 0} 
+                  value={parseInt(taskStats['Completed']) || 0} 
                   total={parseInt(taskStats.total) || 1} 
                   colors={["#22c55e", "#e5e7eb"]} 
                 />

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import useToast from '../../hooks/useToast';
 import PageHeader from '../../components/pageHeader/PageHeader';
 import EmptyState from '../../components/emptyState/EmptyState';
@@ -8,11 +8,15 @@ import ModalAdd from '../../components/modal/ModalAdd';
 import StatusBadge from '../../components/statusBadge/StatusBadge';
 import taskAssignmentService from '../../services/taskAssignmentService';
 import taskService from '../../services/taskService';
+import commentService from '../../services/commentService';
 import { formatDateForDisplay } from '../../utils/dateHelper';
+import { getLastName } from '../../utils/nameHelper';
+import { useAuth } from '../../contexts/AuthContext';
 import './MyTasks.css';
 
 const MyTasks = () => {
   const { toasts, addToast, removeToast } = useToast();
+  const { user } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -20,16 +24,39 @@ const MyTasks = () => {
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
-  const statuses = [
-    { value: 'To Do', label: 'To Do' },
-    { value: 'In Progress', label: 'In Progress' },
-    { value: 'Done', label: 'Done' }
-  ];
+  const [statuses, setStatuses] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const commentsEndRef = useRef(null);
 
   useEffect(() => {
+    loadStatuses();
     loadMyTasks();
   }, []);
+
+  const loadStatuses = async () => {
+    try {
+      const res = await taskService.getStatuses();
+      if (res.success) {
+        // Convert array of strings to array of objects for StatusBadge
+        const statusOptions = res.data.map(status => ({
+          value: status,
+          label: status
+        }));
+        setStatuses(statusOptions);
+      }
+    } catch (err) {
+      console.error('Error loading statuses:', err);
+      // Fallback to default statuses if API fails
+      setStatuses([
+        { value: 'Not Started', label: 'Not Started' },
+        { value: 'In Progress', label: 'In Progress' },
+        { value: 'Completed', label: 'Completed' }
+      ]);
+    }
+  };
 
   const loadMyTasks = async () => {
     setLoading(true);
@@ -59,6 +86,8 @@ const MyTasks = () => {
         });
         setProgressDraft(res.data.progress || 0);
         setIsDetailOpen(true);
+        // Load comments for this task
+        loadComments(task.task_id);
       } else {
         addToast('Không thể tải chi tiết công việc', 'danger');
       }
@@ -67,10 +96,33 @@ const MyTasks = () => {
     }
   };
 
+  const loadComments = async (taskId) => {
+    setLoadingComments(true);
+    try {
+      const res = await commentService.getTaskComments(taskId);
+      if (res.success) {
+        setComments(res.data || []);
+        // Scroll to bottom after loading
+        setTimeout(() => {
+          if (commentsEndRef.current) {
+            commentsEndRef.current.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+      }
+    } catch (err) {
+      console.error('Error loading comments:', err);
+      setComments([]);
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
   const closeDetail = () => {
     setIsDetailOpen(false);
     setSelectedTask(null);
     setProgressDraft(0);
+    setComments([]);
+    setNewComment('');
   };
 
   const updateProgress = async () => {
@@ -81,14 +133,33 @@ const MyTasks = () => {
 
     setUpdating(true);
     try {
+      const progressValue = parseInt(progressDraft);
       const res = await taskService.updateProgress(
         selectedTask.task_id,
-        parseInt(progressDraft)
+        progressValue
       );
       if (res.success) {
-        setSelectedTask(prev => ({ ...prev, progress: parseInt(progressDraft) }));
+        // Update progress
+        setSelectedTask(prev => ({ ...prev, progress: progressValue }));
+        
+        // If progress is 100%, automatically update status to Completed
+        if (progressValue === 100) {
+          try {
+            const statusRes = await taskService.updateStatus(selectedTask.task_id, 'Completed');
+            if (statusRes.success) {
+              setSelectedTask(prev => ({ ...prev, status: 'Completed', task_status: 'Completed' }));
+              addToast('Đã cập nhật tiến độ 100% và chuyển trạng thái sang Completed');
+            } else {
+              addToast('Đã cập nhật tiến độ nhưng không thể tự động chuyển trạng thái', 'warning');
+            }
+          } catch (statusErr) {
+            addToast('Đã cập nhật tiến độ nhưng không thể tự động chuyển trạng thái', 'warning');
+          }
+        } else {
+          addToast('Đã cập nhật tiến độ');
+        }
+        
         await loadMyTasks();
-        addToast('Đã cập nhật tiến độ');
       }
     } catch (err) {
       addToast(err?.response?.data?.message || 'Lỗi khi cập nhật tiến độ', 'danger');
@@ -104,7 +175,7 @@ const MyTasks = () => {
     try {
       const res = await taskService.updateStatus(selectedTask.task_id, newStatus);
       if (res.success) {
-        setSelectedTask(prev => ({ ...prev, status: newStatus }));
+        setSelectedTask(prev => ({ ...prev, status: newStatus, task_status: newStatus }));
         await loadMyTasks();
         addToast('Đã cập nhật trạng thái');
       }
@@ -113,6 +184,41 @@ const MyTasks = () => {
     } finally {
       setUpdating(false);
     }
+  };
+
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim() || !selectedTask) return;
+
+    setSubmittingComment(true);
+    try {
+      const res = await commentService.create(selectedTask.task_id, newComment.trim());
+      if (res.success) {
+        setNewComment('');
+        // Add new comment to list
+        setComments(prev => [...prev, res.data]);
+        // Scroll to bottom
+        setTimeout(() => {
+          if (commentsEndRef.current) {
+            commentsEndRef.current.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+        addToast('Đã thêm bình luận');
+      }
+    } catch (err) {
+      addToast(err?.response?.data?.message || 'Lỗi khi thêm bình luận', 'danger');
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
+  // Get avatar URL
+  const getAvatarUrl = (avatar) => {
+    if (!avatar) return null;
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3036';
+    return avatar.startsWith('http') 
+      ? avatar 
+      : `${API_BASE_URL}/uploads/avatars/${avatar}`;
   };
 
   // Filter tasks based on search query
@@ -240,20 +346,18 @@ const MyTasks = () => {
                 <div className="detail-item">
                   <span className="detail-label">Trạng thái:</span>
                   <div className="detail-value">
-                    <StatusBadge status={selectedTask.task_status} statuses={statuses} />
-                    <div className="status-actions">
+                    <select
+                      value={selectedTask.task_status || selectedTask.status}
+                      onChange={(e) => updateStatus(e.target.value)}
+                      disabled={updating}
+                      className="status-dropdown"
+                    >
                       {statuses.map(status => (
-                        <button
-                          key={status.value}
-                          className={`status-btn ${selectedTask.task_status === status.value ? 'active' : ''}`}
-                          onClick={() => updateStatus(status.value)}
-                          disabled={updating || selectedTask.task_status === status.value}
-                          type="button"
-                        >
+                        <option key={status.value} value={status.value}>
                           {status.label}
-                        </button>
+                        </option>
                       ))}
-                    </div>
+                    </select>
                   </div>
                 </div>
                 {selectedTask.task_due_date && (
@@ -314,6 +418,75 @@ const MyTasks = () => {
                   style={{ width: `${selectedTask.progress || 0}%` }}
                 />
                 <span className="progress-text-large">{selectedTask.progress || 0}%</span>
+              </div>
+            </div>
+
+            {/* Comments Section */}
+            <div className="task-detail-section">
+              <h4>
+                <i className="fas fa-comments"></i>
+                Bình luận ({comments.length})
+              </h4>
+              <div className="comments-container-detail">
+                <div className="comments-list-detail">
+                  {loadingComments ? (
+                    <div className="comments-loading">
+                      <i className="fas fa-spinner fa-spin"></i>
+                      <span>Đang tải bình luận...</span>
+                    </div>
+                  ) : comments.length > 0 ? (
+                    comments.map(comment => (
+                      <div
+                        key={comment.id}
+                        className={`comment-item-detail ${comment.user_id === user.id ? 'own' : ''}`}
+                      >
+                        <div className="comment-avatar-detail">
+                          {comment.avatar ? (
+                            <img src={getAvatarUrl(comment.avatar)} alt={comment.username} />
+                          ) : (
+                            <span>{getLastName(comment.username || 'U').charAt(0).toUpperCase()}</span>
+                          )}
+                        </div>
+                        <div className="comment-content-detail">
+                          <div className="comment-header-detail">
+                            <span className="comment-author-detail">{comment.username}</span>
+                            <span className="comment-time-detail">
+                              {formatDateForDisplay(comment.created_at)}
+                            </span>
+                          </div>
+                          <div className="comment-text-detail">{comment.comment}</div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="comments-empty">
+                      <i className="fas fa-comment-slash"></i>
+                      <span>Chưa có bình luận nào</span>
+                    </div>
+                  )}
+                  <div ref={commentsEndRef}></div>
+                </div>
+
+                <form
+                  className="comment-form-detail"
+                  onSubmit={handleAddComment}
+                >
+                  <input
+                    type="text"
+                    className="comment-input-detail"
+                    placeholder="Nhập bình luận..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    disabled={submittingComment}
+                  />
+                  <button
+                    type="submit"
+                    className="comment-send-btn-detail"
+                    disabled={!newComment.trim() || submittingComment}
+                  >
+                    <i className={`fas ${submittingComment ? 'fa-spinner fa-spin' : 'fa-paper-plane'}`}></i>
+                  </button>
+                </form>
               </div>
             </div>
           </div>

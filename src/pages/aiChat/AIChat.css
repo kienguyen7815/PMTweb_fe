@@ -51,6 +51,69 @@
   flex: 1;
 }
 
+/* Export JSON Styles */
+.export-message {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.json-export-container {
+  position: relative;
+  background: #f5f7fa;
+  border: 1px solid #d1d9e6;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 8px 0;
+}
+
+.json-export {
+  background: #282c34;
+  color: #61dafb;
+  padding: 16px;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-x: auto;
+  margin: 0;
+  white-space: pre;
+}
+
+.copy-json-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  padding: 8px 16px;
+  background: #1c4d70;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+
+.copy-json-btn:hover {
+  background: #2d6a99;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(28, 77, 112, 0.3);
+}
+
+.copy-json-btn:active {
+  transform: translateY(0);
+}
+
+.export-hint {
+  color: #666;
+  font-size: 13px;
+  font-style: italic;
+  margin: 4px 0 0 0;
+}
+
 .ai-chat-header-icon {
   width: 50px;
   height: 50px;
