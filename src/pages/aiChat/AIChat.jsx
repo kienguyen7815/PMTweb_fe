@@ -59,11 +59,18 @@ const AIChat = () => {
 
   // Initialize conversation with AI suggestion
   useEffect(() => {
-    // Start conversation by asking AI to suggest development models
+    // Start conversation by asking AI about project choice
     const initializeChat = async () => {
       try {
         setAiLoading(true);
-        const res = await aiService.chat([], selectedProjectName || null);
+        // Prepare user projects list to send to AI
+        const userProjects = projects.map(p => ({
+          id: p.id,
+          name: p.name,
+          description: p.description || ''
+        }));
+        
+        const res = await aiService.chat([], selectedProjectName || null, userProjects);
         if (res.success && res.data) {
           setAiMessages([{
             role: res.data.role || 'assistant',
@@ -77,8 +84,11 @@ const AIChat = () => {
       }
     };
 
-    initializeChat();
-  }, []);
+    // Only initialize after projects are loaded
+    if (projects.length >= 0) {
+      initializeChat();
+    }
+  }, [projects]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -90,20 +100,52 @@ const AIChat = () => {
     setAiLoading(true);
 
     try {
+      // Prepare user projects list to send to AI
+      const userProjects = projects.map(p => ({
+        id: p.id,
+        name: p.name,
+        description: p.description || ''
+      }));
+      
       const res = await aiService.chat(
         [...aiMessages, { role: 'user', content: userMessage }],
-        selectedProjectName || null
+        selectedProjectName || null,
+        userProjects
       );
+      
       if (res.success && res.data) {
-        setAiMessages(prev => [...prev, { 
+        const aiResponse = {
           role: res.data.role || 'assistant', 
-          content: res.data.content || res.data.message || res.data 
-        }]);
+          content: res.data.content || res.data.message || res.data,
+          type: res.data.type,
+          export_data: res.data.export_data
+        };
+        
+        setAiMessages(prev => [...prev, aiResponse]);
+        
+        // Nếu có export_data, hiển thị thông báo
+        if (res.data.export_data) {
+          addToast('Đã xuất danh sách tasks dạng JSON. Bạn có thể copy để sử dụng.', 'success');
+        }
       } else {
         addToast('Không thể nhận phản hồi từ AI', 'danger');
       }
     } catch (err) {
-      addToast(err?.response?.data?.message || 'Lỗi khi gửi tin nhắn', 'danger');
+      console.error('AI Chat Error:', err);
+      
+      // Xử lý quota exceeded error
+      if (err?.response?.status === 429) {
+        const errorData = err.response.data;
+        if (errorData.error === 'QUOTA_EXCEEDED') {
+          addToast('Đã vượt quá giới hạn requests của AI. Vui lòng thử lại sau vài phút.', 'warning');
+        } else if (errorData.error === 'RATE_LIMIT_EXCEEDED') {
+          addToast('Bạn gửi tin nhắn quá nhanh. Vui lòng chờ một chút.', 'warning');
+        } else {
+          addToast('Quá nhiều requests. Vui lòng thử lại sau.', 'warning');
+        }
+      } else {
+        addToast(err?.response?.data?.message || 'Lỗi khi gửi tin nhắn', 'danger');
+      }
     } finally {
       setAiLoading(false);
     }
@@ -117,7 +159,14 @@ const AIChat = () => {
       const initializeChat = async () => {
         try {
           setAiLoading(true);
-          const res = await aiService.chat([], selectedProjectName || null);
+          // Prepare user projects list to send to AI
+          const userProjects = projects.map(p => ({
+            id: p.id,
+            name: p.name,
+            description: p.description || ''
+          }));
+          
+          const res = await aiService.chat([], selectedProjectName || null, userProjects);
           if (res.success && res.data) {
             setAiMessages([{
               role: res.data.role || 'assistant',
@@ -149,14 +198,27 @@ const AIChat = () => {
       console.log('Parsing AI content for suggestions:', content.substring(0, 500));
     }
     
+    // Skip parsing if content contains project list section
+    const lowerContent = content.toLowerCase();
+    if (lowerContent.includes('danh sách các dự án') || 
+        lowerContent.includes('danh sách dự án') ||
+        lowerContent.includes('dự án hiện có của bạn') ||
+        lowerContent.includes('các dự án hiện có')) {
+      // Don't parse project lists as task suggestions
+      return [];
+    }
+    
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i].trim();
       if (!line) continue;
       
-      // Skip common non-task lines
+      // Skip common non-task lines and project selection related lines
       if (line.toLowerCase().includes('ví dụ') || 
           line.toLowerCase().includes('lưu ý') ||
           line.toLowerCase().includes('chú ý') ||
+          line.toLowerCase().includes('vui lòng') ||
+          line.toLowerCase().includes('danh sách') ||
+          line.toLowerCase().includes('dự án') && line.toLowerCase().includes('chọn') ||
           line.toLowerCase().startsWith('bạn') ||
           line.toLowerCase().startsWith('tôi') ||
           line.toLowerCase().startsWith('chúng ta')) {
@@ -307,8 +369,35 @@ const AIChat = () => {
   };
 
   // Render message with suggestions
-  const renderMessageContent = (content, messageIndex) => {
+  const renderMessageContent = (content, messageIndex, messageData) => {
     if (!content) return null;
+    
+    // Nếu là export type, hiển thị JSON đặc biệt
+    if (messageData?.type === 'export' && messageData?.export_data) {
+      const jsonString = JSON.stringify(messageData.export_data, null, 2);
+      
+      return (
+        <div className="ai-message-text">
+          <div className="export-message">
+            <p>Đây là danh sách tasks theo SDLC dạng JSON:</p>
+            <div className="json-export-container">
+              <pre className="json-export">{jsonString}</pre>
+              <button 
+                className="copy-json-btn"
+                onClick={() => {
+                  navigator.clipboard.writeText(jsonString);
+                  addToast('Đã copy JSON vào clipboard', 'success');
+                }}
+                title="Copy JSON"
+              >
+                <i className="fas fa-copy"></i> Copy JSON
+              </button>
+            </div>
+            <p className="export-hint">Bạn có thể copy JSON này để import vào hệ thống hoặc sử dụng cho mục đích khác.</p>
+          </div>
+        </div>
+      );
+    }
     
     const suggestions = parseSuggestions(content);
     
@@ -369,23 +458,6 @@ const AIChat = () => {
               <p className="ai-chat-subtitle">Hỗ trợ quản lý dự án và đề xuất mô hình phát triển</p>
             </div>
           </div>
-          <div className="ai-chat-project-selector">
-            <select
-              value={selectedProjectId}
-              onChange={(e) => {
-                setSelectedProjectId(e.target.value);
-                const project = projects.find(p => p.id === parseInt(e.target.value));
-                setSelectedProjectName(project?.name || '');
-              }}
-              className="project-select-dropdown"
-              title="Chọn dự án để AI gợi ý theo dự án đó"
-            >
-              <option value="">-- Chọn dự án --</option>
-              {projects.map(p => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
-          </div>
           <button 
             className="clear-chat-button"
             onClick={handleClearChat}
@@ -407,17 +479,18 @@ const AIChat = () => {
                 <h4>Xin chào! Tôi là AI Assistant</h4>
                 <p>Tôi có thể giúp bạn:</p>
                 <ul>
-                  <li>Đề xuất các mô hình phát triển phần mềm (Scrum, Waterfall, Agile, Kanban, v.v.)</li>
-                  <li>Gợi ý quy trình phát triển theo mô hình bạn chọn</li>
-                  <li>Tư vấn về best practices trong quản lý dự án</li>
-                  <li>Trả lời các câu hỏi về phát triển phần mềm</li>
+                  <li>Trò chuyện và tư vấn về dự án phần mềm</li>
+                  <li>Gợi ý các bước phát triển theo SDLC</li>
+                  <li>Đề xuất tasks chi tiết cho từng giai đoạn</li>
+                  <li>Xuất danh sách tasks dạng JSON (gõ <code>/export</code>)</li>
                 </ul>
                 <div className="welcome-examples">
                   <p><strong>Ví dụ câu hỏi:</strong></p>
                   <ul>
-                    <li>"Tôi muốn phát triển dự án theo mô hình Scrum"</li>
-                    <li>"Gợi ý các task cho dự án website bán hàng"</li>
-                    <li>"Mô hình nào phù hợp cho dự án nhỏ?"</li>
+                    <li>"Tôi muốn tạo project mới"</li>
+                    <li>"Hệ thống quản lý đơn hàng"</li>
+                    <li>"Gợi ý tasks chi tiết cho tôi"</li>
+                    <li>"<code>/export</code>" - Xuất tasks dạng JSON</li>
                   </ul>
                 </div>
               </div>
@@ -431,7 +504,7 @@ const AIChat = () => {
                   </div>
                 )}
                 <div className="ai-message-content">
-                  {msg.role === 'assistant' ? renderMessageContent(msg.content, idx) : (
+                  {msg.role === 'assistant' ? renderMessageContent(msg.content, idx, msg) : (
                     <div className="ai-message-text">{msg.content}</div>
                   )}
                   <div className="ai-message-time">

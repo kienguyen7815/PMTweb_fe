@@ -37,6 +37,8 @@ const Projects = () => {
   const [toasts, setToasts] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [memberQuery, setMemberQuery] = useState('');
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
 
 
   const addToast = (message, type = 'success') => {
@@ -212,6 +214,25 @@ const Projects = () => {
   const cancelDelete = () => {
     setIsDeleteOpen(false);
     setDeleteTargetId(null);
+  };
+
+  const openDetailModal = async (project) => {
+    try {
+      const res = await projectService.get(project.id);
+      if (res.success) {
+        setSelectedProject(res.data);
+        setIsDetailOpen(true);
+      } else {
+        addToast('Không thể tải thông tin dự án', 'danger');
+      }
+    } catch (err) {
+      addToast(err?.response?.data?.message || 'Lỗi khi tải thông tin dự án', 'danger');
+    }
+  };
+
+  const closeDetailModal = () => {
+    setIsDetailOpen(false);
+    setSelectedProject(null);
   };
 
 
@@ -518,14 +539,19 @@ const Projects = () => {
 
           <div className="projects-list modern">
             {projects.map(p => (
-              <div className="projects-item card" key={p.id}>
+              <div 
+                className="projects-item card" 
+                key={p.id}
+                onClick={() => openDetailModal(p)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="item-head">
                   <div className="item-title-wrapper">
                     <i className="fas fa-folder item-icon"></i>
                     <div className="item-title">{p.name}</div>
                   </div>
                   {permissions.canEditProject && (
-                    <div className="item-actions">
+                    <div className="item-actions" onClick={(e) => e.stopPropagation()}>
                       <button className="text-btn" onClick={() => handleEdit(p)} title="Sửa">
                         <i className="fas fa-edit"></i>
                       </button>
@@ -608,7 +634,12 @@ const Projects = () => {
       ) : (
         <div className="projects-list modern">
           {projects.map(p => (
-            <div className="projects-item card" key={p.id}>
+            <div 
+              className="projects-item card" 
+              key={p.id}
+              onClick={() => openDetailModal(p)}
+              style={{ cursor: 'pointer' }}
+            >
               <div className="item-head">
                 <div className="item-title-wrapper">
                   <i className="fas fa-folder item-icon"></i>
@@ -651,6 +682,92 @@ const Projects = () => {
           )}
         </div>
       )}
+
+      {/* Project Detail Modal */}
+      <ModalAdd
+        isOpen={isDetailOpen}
+        onClose={closeDetailModal}
+        title={selectedProject?.name || 'Chi tiết dự án'}
+        subtitle="Thông tin chi tiết về dự án"
+        icon="fa-folder-open"
+        size="large"
+        actions={[
+          {
+            label: 'Đóng',
+            icon: 'fa-times',
+            className: 'secondary',
+            onClick: closeDetailModal
+          }
+        ]}
+      >
+        {selectedProject && (
+          <div className="project-detail-content">
+            <div className="project-detail-section">
+              <h4>
+                <i className="fas fa-info-circle"></i>
+                Thông tin dự án
+              </h4>
+              <div className="detail-grid">
+                <div className="detail-item">
+                  <span className="detail-label">Mô tả:</span>
+                  <span className="detail-value">
+                    {selectedProject.description || 'Không có mô tả'}
+                  </span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Trạng thái:</span>
+                  <div className="detail-value">
+                    <StatusBadge status={selectedProject.status} statuses={statuses} />
+                  </div>
+                </div>
+                {selectedProject.start_date && (
+                  <div className="detail-item">
+                    <span className="detail-label">Ngày bắt đầu:</span>
+                    <span className="detail-value">
+                      {new Date(selectedProject.start_date).toLocaleDateString('vi-VN')}
+                    </span>
+                  </div>
+                )}
+                {selectedProject.end_date && (
+                  <div className="detail-item">
+                    <span className="detail-label">Ngày kết thúc:</span>
+                    <span className="detail-value">
+                      {new Date(selectedProject.end_date).toLocaleDateString('vi-VN')}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {selectedProject.members && selectedProject.members.length > 0 && (
+              <div className="project-detail-section">
+                <h4>
+                  <i className="fas fa-users"></i>
+                  Thành viên dự án ({selectedProject.members.length})
+                </h4>
+                <div className="project-members-list">
+                  {selectedProject.members.map(member => (
+                    <div key={member.id} className="project-member-item">
+                      <div className="member-info">
+                        <div className="member-avatar-small">
+                          <span>{getLastName(member.username || 'U').charAt(0).toUpperCase()}</span>
+                        </div>
+                        <div className="member-details">
+                          <span className="member-name">{member.username}</span>
+                          <span className="member-email">{member.email}</span>
+                        </div>
+                      </div>
+                      <span className={`member-role-badge role-${member.role}`}>
+                        {member.role === 'pm' ? 'PM' : member.role === 'tl' ? 'TL' : 'MB'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </ModalAdd>
     </div>
   );
 };

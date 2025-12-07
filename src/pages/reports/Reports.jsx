@@ -136,6 +136,19 @@ const Reports = () => {
   const [userActivity, setUserActivity] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Status icons mapping
+  const statusIcons = {
+    'Not Started': { icon: 'fa-pause-circle', color: '#94a3b8' },
+    'In Progress': { icon: 'fa-spinner', color: '#3b82f6' },
+    'Completed': { icon: 'fa-check-circle', color: '#22c55e' },
+    'Pending': { icon: 'fa-clock', color: '#f59e0b' },
+    'Planned': { icon: 'fa-calendar-alt', color: '#8b5cf6' },
+    'Cancelled': { icon: 'fa-times-circle', color: '#ef4444' },
+    'Testing': { icon: 'fa-flask', color: '#14b8a6' },
+    'In Review': { icon: 'fa-search', color: '#06b6d4' },
+    'Delayed': { icon: 'fa-exclamation-triangle', color: '#f97316' }
+  };
+
   useEffect(() => {
     if (canView) {
       loadReports();
@@ -214,24 +227,36 @@ const Reports = () => {
             {projectStats && (
               <div className="stats-card">
                 <div className="stats-header">
-                  <i className="fas fa-folder"></i>
-                  <h3>Thống kê dự án</h3>
+                  <i className="fas fa-folder-open"></i>
+                  <h3>📊 Thống kê dự án</h3>
                 </div>
                 <div className="stats-body">
                   <div className="stat-item">
-                    <span className="stat-label">Tổng số dự án</span>
+                    <span className="stat-label">
+                      <i className="fas fa-layer-group" style={{marginRight: '8px', color: '#667eea'}}></i>
+                      Tổng số dự án
+                    </span>
                     <span className="stat-value">{projectStats.total || 0}</span>
                   </div>
                   <div className="stat-item">
-                    <span className="stat-label">Chưa bắt đầu</span>
+                    <span className="stat-label">
+                      <i className="fas fa-pause-circle" style={{marginRight: '8px', color: '#94a3b8'}}></i>
+                      Chưa bắt đầu
+                    </span>
                     <span className="stat-value">{projectStats.not_started || 0}</span>
                   </div>
                   <div className="stat-item">
-                    <span className="stat-label">Đang thực hiện</span>
+                    <span className="stat-label">
+                      <i className="fas fa-spinner" style={{marginRight: '8px', color: '#3b82f6'}}></i>
+                      Đang thực hiện
+                    </span>
                     <span className="stat-value">{projectStats.in_progress || 0}</span>
                   </div>
                   <div className="stat-item">
-                    <span className="stat-label">Hoàn thành</span>
+                    <span className="stat-label">
+                      <i className="fas fa-check-circle" style={{marginRight: '8px', color: '#22c55e'}}></i>
+                      Hoàn thành
+                    </span>
                     <span className="stat-value">{projectStats.completed || 0}</span>
                   </div>
                 </div>
@@ -243,27 +268,38 @@ const Reports = () => {
               <div className="stats-card">
                 <div className="stats-header">
                   <i className="fas fa-tasks"></i>
-                  <h3>Thống kê công việc</h3>
+                  <h3>✅ Thống kê công việc</h3>
                 </div>
                 <div className="stats-body">
                   <div className="stat-item">
-                    <span className="stat-label">Tổng số công việc</span>
+                    <span className="stat-label">
+                      <i className="fas fa-list-ul" style={{marginRight: '8px', color: '#667eea'}}></i>
+                      Tổng số công việc
+                    </span>
                     <span className="stat-value">{taskStats.total || 0}</span>
                   </div>
+                  
+                  {/* Dynamically render all statuses */}
+                  {taskStats.statuses && taskStats.statuses.map((status) => {
+                    const statusConfig = statusIcons[status] || { icon: 'fa-circle', color: '#64748b' };
+                    const count = taskStats[status] || 0;
+                    
+                    return (
+                      <div className="stat-item" key={status}>
+                        <span className="stat-label">
+                          <i className={`fas ${statusConfig.icon}`} style={{marginRight: '8px', color: statusConfig.color}}></i>
+                          {status}
+                        </span>
+                        <span className="stat-value">{count}</span>
+                      </div>
+                    );
+                  })}
+                  
                   <div className="stat-item">
-                    <span className="stat-label">To Do</span>
-                    <span className="stat-value">{taskStats.to_do || 0}</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-label">In Progress</span>
-                    <span className="stat-value">{taskStats.in_progress || 0}</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-label">Done</span>
-                    <span className="stat-value">{taskStats.done || 0}</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-label">Tiến độ trung bình</span>
+                    <span className="stat-label">
+                      <i className="fas fa-chart-line" style={{marginRight: '8px', color: '#8b5cf6'}}></i>
+                      Tiến độ trung bình
+                    </span>
                     <span className="stat-value">{Math.round(parseFloat(taskStats.avg_progress) || 0)}%</span>
                   </div>
                 </div>
@@ -272,23 +308,23 @@ const Reports = () => {
 
             {/* Charts */}
             {monthChartData.length > 0 && (
-              <BarChart title="Công việc theo tháng" data={monthChartData} />
+              <BarChart title="📅 Công việc theo tháng" data={monthChartData} />
             )}
 
             {progressChartData.length > 0 && (
-              <BarChart title="Tiến độ theo dự án" data={progressChartData} max={100} />
+              <BarChart title="📈 Tiến độ theo dự án" data={progressChartData} max={100} />
             )}
 
             {taskStats && (
               <>
                 <PieChart 
-                  title="Tasks đang làm" 
-                  value={parseInt(taskStats.in_progress) || 0} 
+                  title="⏳ Tasks đang thực hiện" 
+                  value={parseInt(taskStats['In Progress']) || 0} 
                   total={parseInt(taskStats.total) || 1} 
                 />
                 <PieChart 
-                  title="Tasks hoàn thành" 
-                  value={parseInt(taskStats.done) || 0} 
+                  title="🎯 Tasks hoàn thành" 
+                  value={parseInt(taskStats['Completed']) || 0} 
                   total={parseInt(taskStats.total) || 1} 
                   colors={["#22c55e", "#e5e7eb"]} 
                 />

@@ -153,18 +153,6 @@ const UserManagement = () => {
                         value={filters.search}
                         onChange={handleSearch}
                     />
-                    <select
-                        className="admin-select"
-                        value={filters.role}
-                        onChange={handleRoleFilter}
-                    >
-                        <option value="">Tất cả vai trò</option>
-                        <option value="admin">Admin</option>
-                        <option value="pm">Project Manager</option>
-                        <option value="tl">Team Leader</option>
-                        <option value="mb">Member</option>
-                        <option value="user">User</option>
-                    </select>
                 </div>
 
                 {/* Users Table */}

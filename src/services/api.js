@@ -4,14 +4,14 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:303
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000, // 10 seconds timeout
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
 });
 
-// Request interceptor để thêm token và workspace_id
+// Thêm token và workspace_id vào mỗi request để xác thực và phân quyền
 api.interceptors.request.use(
   (config) => {
     const token = sessionStorage.getItem('token');
@@ -19,32 +19,31 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    // Thêm workspace_id từ localStorage nếu có (được set bởi WorkspaceContext)
+    // Gửi workspace_id để backend biết user đang làm việc trong workspace nào
     const workspaceId = localStorage.getItem('currentWorkspaceId');
     if (workspaceId) {
       config.headers['x-workspace-id'] = workspaceId;
-      // Nếu là POST/PUT và có body, thêm workspace_id vào body nếu chưa có
+      // Tự động thêm workspace_id vào body để backend không cần check header
       if ((config.method === 'post' || config.method === 'put') && config.data && typeof config.data === 'object' && !(config.data instanceof FormData)) {
         if (!config.data.workspace_id) {
           config.data.workspace_id = parseInt(workspaceId);
         }
       }
-      // Nếu là GET, thêm vào query params nếu chưa có
+      // GET request cần workspace_id trong query params thay vì body
       if (config.method === 'get' && !config.params?.workspace_id) {
         if (!config.params) config.params = {};
         config.params.workspace_id = workspaceId;
       }
     }
     
-    // Đảm bảo Content-Type được set đúng (trừ khi là FormData)
-    // Với FormData, để browser tự động set Content-Type với boundary
+    // FormData cần browser tự set Content-Type để có boundary cho multipart
     if (config.data instanceof FormData) {
       delete config.headers['Content-Type'];
     } else if (!config.headers['Content-Type']) {
       config.headers['Content-Type'] = 'application/json';
     }
     
-    // Logging chỉ trong development
+    // Debug request để kiểm tra workspace context
     if (process.env.NODE_ENV === 'development') {
       console.log('API Request:', {
         method: config.method?.toUpperCase(),
@@ -63,7 +62,7 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor để xử lý lỗi
+// Xử lý response và các lỗi phổ biến từ backend
 api.interceptors.response.use(
   (response) => {
     if (process.env.NODE_ENV === 'development') {
@@ -75,7 +74,7 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Logging chỉ trong development
+    // Debug error để dễ dàng troubleshoot
     if (process.env.NODE_ENV === 'development') {
       console.error('API Error:', {
         status: error.response?.status,
@@ -84,11 +83,11 @@ api.interceptors.response.use(
       });
     }
     
-    // Handle 401 Unauthorized
+    // Token hết hạn hoặc không hợp lệ, đăng xuất tự động
     if (error.response?.status === 401) {
       sessionStorage.removeItem('token');
       sessionStorage.removeItem('user');
-      // Chỉ redirect nếu không phải đang ở trang login
+      // Tránh redirect loop khi đã ở trang login
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }

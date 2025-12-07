@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -6,12 +6,14 @@ import './Workspaces.css';
 
 const Workspaces = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { workspaces, currentWorkspace, loading, selectWorkspace, createWorkspace } = useWorkspace();
   const [form, setForm] = useState({ name: '', description: '' });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef(null);
 
   // Phân tách workspace do mình tạo và workspace được mời/tham gia
   const ownedWorkspaces = Array.isArray(workspaces)
@@ -61,8 +63,92 @@ const Workspaces = () => {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const handleBackToHome = () => {
+    navigate('/');
+  };
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserMenu]);
+
   return (
     <div className="workspaces-page">
+      {/* Top Navigation Bar */}
+      <div className="workspace-top-nav">
+        <button className="back-to-home-btn" onClick={handleBackToHome} title="Trở về trang chủ">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          <span>Trang chủ</span>
+        </button>
+        
+        <div className="user-menu-container" ref={userMenuRef}>
+          <button 
+            className="user-name-btn" 
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            title="Menu người dùng"
+          >
+            <div className="user-avatar">
+              {user?.avatar_url ? (
+                <img src={user.avatar_url} alt={user.full_name} />
+              ) : (
+                <span>{user?.full_name?.charAt(0).toUpperCase() || 'U'}</span>
+              )}
+            </div>
+            <span className="user-name">{user?.full_name || 'Người dùng'}</span>
+            <svg 
+              className={`dropdown-arrow ${showUserMenu ? 'open' : ''}`}
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          
+          {showUserMenu && (
+            <div className="user-dropdown-menu">
+              <div className="user-info-section">
+                <div className="user-info-name">{user?.full_name}</div>
+                <div className="user-info-email">{user?.email}</div>
+              </div>
+              <div className="dropdown-divider"></div>
+              <button className="logout-btn" onClick={handleLogout}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Đăng xuất</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="workspaces-hero" >
         <div>
           <p className="hero-eyebrow">Không gian làm việc</p>

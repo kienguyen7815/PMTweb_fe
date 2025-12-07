@@ -10,6 +10,7 @@ export const usePermissions = () => {
   const role = workspaceRole || globalRole || null;
   const inWorkspaceContext = Boolean(workspaceRole);
 
+  // Trả về object rỗng khi chưa có role để tránh lỗi
   if (!role) {
     return {
       isAdmin: false,
@@ -39,6 +40,7 @@ export const usePermissions = () => {
     };
   }
 
+  // Kiểm tra user có role nào đó trong danh sách cho phép
   const resolveRoles = (allowedRoles, { requireWorkspace = false } = {}) => {
     if (!Array.isArray(allowedRoles) || allowedRoles.length === 0) return true;
     if (requireWorkspace) {
@@ -49,60 +51,55 @@ export const usePermissions = () => {
   };
 
   return {
-    // Role checks
+    // Kiểm tra role cụ thể của user
     isAdmin: !inWorkspaceContext && role === 'admin',
     isPM: role === 'pm',
     isTL: role === 'tl',
     isMember: role === 'mb',
     isClient: role === 'clt',
 
-    // Basic permissions (PM trong workspace có toàn quyền)
+    // Quyền cơ bản theo role hierarchy
     canView: resolveRoles(['pm', 'tl', 'mb', 'clt'], { requireWorkspace: inWorkspaceContext }),
     canEdit: resolveRoles(inWorkspaceContext ? ['pm', 'tl'] : ['ad', 'pm', 'tl']),
     canManageMembers: resolveRoles(inWorkspaceContext ? ['pm'] : ['ad', 'pm', 'tl']),
     canDelete: resolveRoles(inWorkspaceContext ? ['pm'] : ['ad', 'pm', 'tl']),
 
-    // Project permissions
+    // Quyền quản lý project
     canCreateProject: resolveRoles(inWorkspaceContext ? ['pm', 'tl'] : ['ad', 'pm', 'tl']),
     canEditProject: resolveRoles(inWorkspaceContext ? ['pm', 'tl'] : ['ad', 'pm', 'tl']),
     canDeleteProject: resolveRoles(inWorkspaceContext ? ['pm'] : ['ad', 'pm']),
     canViewProjects: resolveRoles(['pm', 'tl', 'mb', 'clt'], { requireWorkspace: inWorkspaceContext }),
 
-    // Task permissions
+    // Quyền quản lý task
     canCreateTask: resolveRoles(inWorkspaceContext ? ['pm', 'tl'] : ['ad', 'pm', 'tl']),
     canEditTask: resolveRoles(inWorkspaceContext ? ['pm', 'tl'] : ['ad', 'pm', 'tl']),
     canDeleteTask: resolveRoles(inWorkspaceContext ? ['pm'] : ['ad', 'pm', 'tl']),
     canViewTasks: resolveRoles(['pm', 'tl', 'mb'], { requireWorkspace: inWorkspaceContext }),
 
-    // Member permissions
+    // Quyền quản lý thành viên
     canViewMembers: resolveRoles(['pm', 'tl', 'mb', 'clt'], { requireWorkspace: inWorkspaceContext }),
     canAddMembers: resolveRoles(['pm'], { requireWorkspace: inWorkspaceContext }),
     canRemoveMembers: resolveRoles(['pm'], { requireWorkspace: inWorkspaceContext }),
     canEditUserRole: resolveRoles(['pm'], { requireWorkspace: inWorkspaceContext }),
 
-    // Feature permissions
+    // Quyền truy cập các tính năng
     canViewReports: resolveRoles(['pm', 'tl'], { requireWorkspace: inWorkspaceContext }),
     canViewNotifications: resolveRoles(['pm', 'tl', 'mb', 'clt'], { requireWorkspace: inWorkspaceContext }),
     canViewChat: resolveRoles(['pm', 'tl', 'mb', 'clt'], { requireWorkspace: inWorkspaceContext }),
     canViewMyTasks: resolveRoles(['pm', 'tl', 'mb'], { requireWorkspace: inWorkspaceContext }),
     canViewTeam: resolveRoles(['pm', 'tl'], { requireWorkspace: inWorkspaceContext }),
 
-    // Admin only features (global scope)
-    // canManageUsers: chỉ hoạt động khi không có workspace context (global scope)
-    // Trong workspace, PM có thể quản lý members thông qua canManageMembers
+    // Quyền admin chỉ có hiệu lực ở cấp toàn hệ thống
     canManageUsers: !inWorkspaceContext && resolveRoles(['ad', 'pm']),
     canDeleteUsers: !inWorkspaceContext && resolveRoles(['ad']),
     canViewAllUsers: !inWorkspaceContext && resolveRoles(['ad', 'pm']),
     
-    // Team page permissions - cho phép PM và TL trong workspace cũng có thể xem
-    // canViewTeam đã được định nghĩa ở trên với workspace support
-
-    // Helper functions
+    // Hàm tiện ích để kiểm tra role
     hasRole: (roles) => resolveRoles(Array.isArray(roles) ? roles : [roles]),
     hasAnyRole: (roles) => roles.some(roleName => resolveRoles([roleName])),
     hasAllRoles: (roles) => roles.every(roleName => resolveRoles([roleName])),
 
-    // Get role display name
+    // Lấy tên hiển thị của role
     getRoleDisplayName: () => {
       const roleNames = {
         'ad': 'Admin',
@@ -114,7 +111,7 @@ export const usePermissions = () => {
       return roleNames[role] || 'Unknown';
     },
 
-    // Get role color for UI
+    // Lấy màu sắc tương ứng với role cho UI
     getRoleColor: () => {
       const roleColors = {
         'ad': '#dc3545', // Red

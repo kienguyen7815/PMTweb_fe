@@ -7,6 +7,7 @@ const ActivityLogs = () => {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [pagination, setPagination] = useState({});
+    const [stats, setStats] = useState(null);
     const [filters, setFilters] = useState({
         page: 1,
         limit: 50,
@@ -20,6 +21,7 @@ const ActivityLogs = () => {
 
     useEffect(() => {
         loadLogs();
+        loadStats();
     }, [filters]);
 
     const loadLogs = async () => {
@@ -34,6 +36,18 @@ const ActivityLogs = () => {
             showToast(error.message || 'Không thể tải activity logs', 'error');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const loadStats = async () => {
+        try {
+            const response = await adminService.getActivityStats();
+            if (response.success) {
+                setStats(response.data);
+            }
+        } catch (error) {
+            // Silent fail for stats
+            console.error('Failed to load stats:', error);
         }
     };
 
@@ -58,19 +72,27 @@ const ActivityLogs = () => {
     };
 
     const getActionIcon = (action) => {
-        if (action.includes('create')) return 'fa-plus-circle';
-        if (action.includes('update')) return 'fa-edit';
-        if (action.includes('delete')) return 'fa-trash';
-        if (action.includes('login')) return 'fa-sign-in-alt';
-        if (action.includes('logout')) return 'fa-sign-out-alt';
+        const lowerAction = action.toLowerCase();
+        if (lowerAction.includes('create') || lowerAction.includes('add')) return 'fa-plus-circle';
+        if (lowerAction.includes('update') || lowerAction.includes('edit')) return 'fa-edit';
+        if (lowerAction.includes('delete') || lowerAction.includes('remove')) return 'fa-trash';
+        if (lowerAction.includes('login')) return 'fa-sign-in-alt';
+        if (lowerAction.includes('logout')) return 'fa-sign-out-alt';
+        if (lowerAction.includes('view') || lowerAction.includes('search')) return 'fa-eye';
+        if (lowerAction.includes('member')) return 'fa-users';
+        if (lowerAction.includes('workspace')) return 'fa-building';
+        if (lowerAction.includes('project')) return 'fa-folder';
+        if (lowerAction.includes('task')) return 'fa-tasks';
         return 'fa-circle';
     };
 
     const getActionColor = (action) => {
-        if (action.includes('create')) return '#10b981';
-        if (action.includes('update')) return '#3b82f6';
-        if (action.includes('delete')) return '#ef4444';
-        if (action.includes('login')) return '#8b5cf6';
+        const lowerAction = action.toLowerCase();
+        if (lowerAction.includes('create') || lowerAction.includes('add')) return '#10b981';
+        if (lowerAction.includes('update') || lowerAction.includes('edit')) return '#3b82f6';
+        if (lowerAction.includes('delete') || lowerAction.includes('remove')) return '#ef4444';
+        if (lowerAction.includes('login')) return '#8b5cf6';
+        if (lowerAction.includes('view') || lowerAction.includes('search')) return '#6366f1';
         return '#64748b';
     };
 
@@ -111,6 +133,86 @@ const ActivityLogs = () => {
             </div>
 
             <div className="admin-content">
+                {/* Quick Stats */}
+                {stats && stats.actionsByType && stats.actionsByType.length > 0 && (
+                    <div style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+                        gap: '16px', 
+                        marginBottom: '20px' 
+                    }}>
+                        <div style={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            padding: '20px',
+                            borderRadius: '12px',
+                            color: 'white',
+                            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                        }}>
+                            <div style={{ fontSize: '13px', opacity: 0.9, marginBottom: '4px' }}>
+                                <i className="fa-solid fa-chart-line"></i> Tổng hoạt động
+                            </div>
+                            <div style={{ fontSize: '28px', fontWeight: 'bold' }}>
+                                {stats.actionsByType.reduce((sum, item) => sum + item.count, 0).toLocaleString()}
+                            </div>
+                        </div>
+
+                        <div style={{
+                            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                            padding: '20px',
+                            borderRadius: '12px',
+                            color: 'white',
+                            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                        }}>
+                            <div style={{ fontSize: '13px', opacity: 0.9, marginBottom: '4px' }}>
+                                <i className="fa-solid fa-bolt"></i> Loại hành động
+                            </div>
+                            <div style={{ fontSize: '28px', fontWeight: 'bold' }}>
+                                {stats.actionsByType.length}
+                            </div>
+                        </div>
+
+                        {stats.topActiveUsers && stats.topActiveUsers.length > 0 && (
+                            <div style={{
+                                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                                padding: '20px',
+                                borderRadius: '12px',
+                                color: 'white',
+                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                            }}>
+                                <div style={{ fontSize: '13px', opacity: 0.9, marginBottom: '4px' }}>
+                                    <i className="fa-solid fa-user-check"></i> User hoạt động nhất
+                                </div>
+                                <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
+                                    {stats.topActiveUsers[0].username}
+                                </div>
+                                <div style={{ fontSize: '12px', opacity: 0.8 }}>
+                                    {stats.topActiveUsers[0].activity_count} hoạt động
+                                </div>
+                            </div>
+                        )}
+
+                        {stats.activitiesByTable && stats.activitiesByTable.length > 0 && (
+                            <div style={{
+                                background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                                padding: '20px',
+                                borderRadius: '12px',
+                                color: 'white',
+                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                            }}>
+                                <div style={{ fontSize: '13px', opacity: 0.9, marginBottom: '4px' }}>
+                                    <i className="fa-solid fa-table"></i> Bảng nhiều hoạt động nhất
+                                </div>
+                                <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
+                                    {stats.activitiesByTable[0].target_table || 'N/A'}
+                                </div>
+                                <div style={{ fontSize: '12px', opacity: 0.8 }}>
+                                    {stats.activitiesByTable[0].count} hoạt động
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {/* Filters */}
                 <div className="admin-filters">
                     <input
@@ -129,10 +231,14 @@ const ActivityLogs = () => {
                         <option value="">Tất cả bảng</option>
                         <option value="users">Users</option>
                         <option value="workspaces">Workspaces</option>
+                        <option value="workspace_members">Workspace Members</option>
+                        <option value="members">Members</option>
                         <option value="prj">Projects</option>
                         <option value="tasks">Tasks</option>
                         <option value="prj_mb">Project Members</option>
                         <option value="tsk_asg">Task Assignments</option>
+                        <option value="tsk_cmt">Task Comments</option>
+                        <option value="prj_cmt">Project Comments</option>
                     </select>
                     <input
                         type="date"
@@ -152,6 +258,27 @@ const ActivityLogs = () => {
 
                 {/* Logs Timeline */}
                 <div style={{ marginTop: '20px' }}>
+                    {logs.length > 0 && (
+                        <div style={{ 
+                            marginBottom: '16px', 
+                            padding: '12px 16px', 
+                            background: '#f1f5f9', 
+                            borderRadius: '8px',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <span style={{ fontSize: '14px', color: '#475569', fontWeight: '500' }}>
+                                <i className="fa-solid fa-list-check"></i> Tổng số: {pagination.total || logs.length} logs
+                            </span>
+                            {pagination.totalPages > 1 && (
+                                <span style={{ fontSize: '13px', color: '#64748b' }}>
+                                    Hiển thị {((pagination.page - 1) * filters.limit) + 1} - {Math.min(pagination.page * filters.limit, pagination.total)} trong số {pagination.total}
+                                </span>
+                            )}
+                        </div>
+                    )}
+                    
                     {logs.map((log) => (
                         <div
                             key={log.id}
@@ -163,29 +290,33 @@ const ActivityLogs = () => {
                                 borderRadius: '8px',
                                 marginBottom: '12px',
                                 border: '1px solid #e2e8f0',
-                                transition: 'all 0.2s'
+                                transition: 'all 0.2s',
+                                boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
                             }}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.background = '#f8fafc';
                                 e.currentTarget.style.borderColor = '#cbd5e1';
+                                e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.07)';
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.background = 'white';
                                 e.currentTarget.style.borderColor = '#e2e8f0';
+                                e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
                             }}
                         >
                             {/* Icon */}
                             <div
                                 style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '8px',
+                                    width: '44px',
+                                    height: '44px',
+                                    borderRadius: '10px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     flexShrink: 0,
-                                    background: `${getActionColor(log.action)}20`,
-                                    color: getActionColor(log.action)
+                                    background: `${getActionColor(log.action)}15`,
+                                    color: getActionColor(log.action),
+                                    fontSize: '18px'
                                 }}
                             >
                                 <i className={`fa-solid ${getActionIcon(log.action)}`}></i>
@@ -193,33 +324,80 @@ const ActivityLogs = () => {
 
                             {/* Content */}
                             <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '4px' }}>
-                                    <div>
-                                        <strong style={{ color: '#1e293b' }}>{log.action}</strong>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '6px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                        <strong style={{ 
+                                            color: '#1e293b', 
+                                            fontSize: '15px',
+                                            fontWeight: '600' 
+                                        }}>
+                                            {log.action}
+                                        </strong>
                                         {log.target_table && (
-                                            <span style={{ marginLeft: '8px', fontSize: '13px', color: '#64748b' }}>
-                                                in <span className="admin-badge member">{log.target_table}</span>
+                                            <span style={{ 
+                                                fontSize: '12px', 
+                                                padding: '2px 8px',
+                                                borderRadius: '4px',
+                                                background: '#e0e7ff',
+                                                color: '#4f46e5',
+                                                fontWeight: '500'
+                                            }}>
+                                                {log.target_table}
+                                            </span>
+                                        )}
+                                        {log.target_id && (
+                                            <span style={{ 
+                                                fontSize: '11px', 
+                                                color: '#94a3b8',
+                                                fontFamily: 'monospace'
+                                            }}>
+                                                #ID:{log.target_id}
                                             </span>
                                         )}
                                     </div>
-                                    <span style={{ fontSize: '12px', color: '#64748b', whiteSpace: 'nowrap' }}>
+                                    <span style={{ 
+                                        fontSize: '12px', 
+                                        color: '#64748b', 
+                                        whiteSpace: 'nowrap',
+                                        marginLeft: '12px'
+                                    }}>
+                                        <i className="fa-solid fa-clock" style={{ marginRight: '4px' }}></i>
                                         {formatDistanceToNow(log.created_at)}
                                     </span>
                                 </div>
 
-                                <div style={{ fontSize: '14px', color: '#64748b', marginBottom: '4px' }}>
-                                    {log.description || 'No description'}
-                                </div>
+                                {log.description && (
+                                    <div style={{ 
+                                        fontSize: '14px', 
+                                        color: '#475569', 
+                                        marginBottom: '8px',
+                                        lineHeight: '1.5'
+                                    }}>
+                                        {log.description}
+                                    </div>
+                                )}
 
-                                <div style={{ fontSize: '13px', color: '#94a3b8', display: 'flex', gap: '16px' }}>
+                                <div style={{ 
+                                    fontSize: '13px', 
+                                    color: '#94a3b8', 
+                                    display: 'flex', 
+                                    gap: '16px',
+                                    alignItems: 'center'
+                                }}>
                                     {log.username && (
-                                        <span>
-                                            <i className="fa-solid fa-user"></i> {log.username}
-                                        </span>
-                                    )}
-                                    {log.target_id && (
-                                        <span>
-                                            <i className="fa-solid fa-hashtag"></i> ID: {log.target_id}
+                                        <span style={{ 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            gap: '4px',
+                                            padding: '2px 8px',
+                                            background: '#f1f5f9',
+                                            borderRadius: '4px'
+                                        }}>
+                                            <i className="fa-solid fa-user" style={{ fontSize: '11px' }}></i>
+                                            <span style={{ fontWeight: '500', color: '#64748b' }}>{log.username}</span>
+                                            {log.email && (
+                                                <span style={{ color: '#94a3b8' }}>({log.email})</span>
+                                            )}
                                         </span>
                                     )}
                                 </div>

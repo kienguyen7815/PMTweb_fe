@@ -1,7 +1,27 @@
+/* Background Image */
+.page-bgr {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.page-bgr img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.6);
+}
+
 .services-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  z-index: 1;
 }
+
 
 /* Hero Section */
 .services-hero {
@@ -103,13 +123,13 @@
 .feature-icon {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #fff;
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2.5rem;
-  color: #fff;
+  color: #000;
   margin-bottom: 25px;
 }
 
@@ -167,13 +187,13 @@
 .feature-icon-small {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #fff;
   border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.8rem;
-  color: #fff;
+  color: #000;
   margin-bottom: 20px;
 }
 
@@ -332,7 +352,7 @@
 
 .btn-primary {
   background: #fff;
-  color: #667eea;
+  color: #000;
 }
 
 .btn-primary:hover {

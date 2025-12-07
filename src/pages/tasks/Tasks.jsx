@@ -697,7 +697,33 @@ const Tasks = () => {
                 <div className="detail-item">
                   <span className="detail-label">Trạng thái:</span>
                   <div className="detail-value">
-                    <StatusBadge status={selectedTask.status} statuses={statuses} />
+                    {canEditProgress(selectedTask.id) || permissions.isPM || permissions.isAdmin ? (
+                      <select
+                        className="status-dropdown"
+                        value={selectedTask.status}
+                        onChange={async (e) => {
+                          const newStatus = e.target.value;
+                          try {
+                            const res = await taskService.updateStatus(selectedTask.id, newStatus);
+                            if (res.success) {
+                              setSelectedTask(prev => ({ ...prev, status: newStatus }));
+                              await loadTasks(selectedProjectId);
+                              addToast('Đã cập nhật trạng thái');
+                            }
+                          } catch (err) {
+                            addToast(err?.response?.data?.message || 'Lỗi khi cập nhật trạng thái', 'danger');
+                          }
+                        }}
+                      >
+                        {statuses.map(status => (
+                          <option key={status.value} value={status.value}>
+                            {status.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <StatusBadge status={selectedTask.status} statuses={statuses} />
+                    )}
                   </div>
                 </div>
                 <div className="detail-item">

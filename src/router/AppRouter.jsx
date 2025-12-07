@@ -8,7 +8,6 @@ import NotFound from '../pages/notFound/NotFound';
 import Login from '../pages/auth/login/Login';
 import Register from '../pages/auth/register/Register';
 import ProtectedRoute from '../components/protectedRoute/ProtectedRoute';
-import Dashboard from '../pages/dashboard/Dashboard';
 import Projects from '../pages/projects/Projects';
 import Tasks from '../pages/tasks/Tasks';
 import MyTasks from '../pages/myTasks/MyTasks';
@@ -35,13 +34,6 @@ const AppRouter = () => {
       <Route path="/admin" element={
         <ProtectedRoute requireAdmin={true}>
           <Admin />
-        </ProtectedRoute>
-      } />
-
-      {/* Dashboard - Chỉ Admin (deprecated, redirect to /admin) */}
-      <Route path="/dashboard" element={
-        <ProtectedRoute requireAdmin={true}>
-          <Dashboard />
         </ProtectedRoute>
       } />
 

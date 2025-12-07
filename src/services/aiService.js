@@ -1,20 +1,20 @@
 import api from './api';
 
 const aiService = {
-  // Chat with AI for task suggestions
-  chat: async (messages, project_name) => {
-    // AI requests need longer timeout (60 seconds)
-    const res = await api.post('/ai/chat', { messages, project_name }, {
-      timeout: 60000 // 60 seconds for AI requests
+  // Trò chuyện với AI để nhận gợi ý về dự án và tasks
+  chat: async (messages, project_name, user_projects) => {
+    // AI cần thời gian xử lý lâu hơn request thông thường
+    const res = await api.post('/ai/chat', { messages, project_name, user_projects }, {
+      timeout: 60000
     });
     return res.data;
   },
 
-  // Generate task suggestions based on project name (legacy)
+  // Tạo danh sách tasks theo SDLC từ tên dự án (phiên bản cũ)
   generateTaskSuggestions: async (project_name) => {
-    // AI requests need longer timeout (60 seconds)
+    // Gemini API cần thời gian để generate danh sách tasks
     const res = await api.post('/ai/tasks/suggestions', { project_name }, {
-      timeout: 60000 // 60 seconds for AI requests
+      timeout: 60000
     });
     return res.data;
   }

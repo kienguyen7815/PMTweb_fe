@@ -350,8 +350,21 @@ const Chat = () => {
                     </div>
                   </div>
                 ))
+              ) : sidebarSearchQuery ? (
+                <div className="chat-empty-chats">
+                  <i className="fas fa-search"></i>
+                  <span>Không tìm thấy đoạn chat nào</span>
+                </div>
+              ) : projects.length > 0 ? (
+                <div className="chat-empty-chats">
+                  <i className="fas fa-search"></i>
+                  <span>Không tìm thấy kết quả</span>
+                </div>
               ) : (
-                <div className="chat-empty-chats">Chưa có đoạn chat nào</div>
+                <div className="chat-empty-chats">
+                  <i className="fas fa-folder-open"></i>
+                  <span>Chưa có dự án nào trong workspace</span>
+                </div>
               )}
             </div>
           </div>
