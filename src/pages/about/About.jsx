@@ -6,6 +6,11 @@ import imgBgr from '../../assets/img/ai-5202865_1920.jpg'
 const About = () => {
   return (
     <div className="container">
+      {/* Background Image */}
+      <div className="page-bgr">
+        <img src={imgBgr} alt="background"/>
+      </div>
+
       <Header />
       
       <div className="about-page">

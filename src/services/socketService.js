@@ -58,9 +58,10 @@ const getSocket = () => {
     },
     transports: ['websocket', 'polling'],
     reconnection: true,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 5000,
-    reconnectionAttempts: 5
+    reconnectionDelay: 2000, // Tăng delay từ 1s lên 2s
+    reconnectionDelayMax: 10000, // Tăng max delay từ 5s lên 10s
+    reconnectionAttempts: 3, // Giảm từ 5 xuống 3 attempts
+    timeout: 20000 // Thêm timeout 20s
   });
 
   socket.on('connect', () => {

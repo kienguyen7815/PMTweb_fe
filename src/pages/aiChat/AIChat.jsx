@@ -59,11 +59,18 @@ const AIChat = () => {
 
   // Initialize conversation with AI suggestion
   useEffect(() => {
-    // Start conversation by asking AI to suggest development models
+    // Start conversation by asking AI about project choice
     const initializeChat = async () => {
       try {
         setAiLoading(true);
-        const res = await aiService.chat([], selectedProjectName || null);
+        // Prepare user projects list to send to AI
+        const userProjects = projects.map(p => ({
+          id: p.id,
+          name: p.name,
+          description: p.description || ''
+        }));
+        
+        const res = await aiService.chat([], selectedProjectName || null, userProjects);
         if (res.success && res.data) {
           setAiMessages([{
             role: res.data.role || 'assistant',
@@ -77,8 +84,11 @@ const AIChat = () => {
       }
     };
 
-    initializeChat();
-  }, []);
+    // Only initialize after projects are loaded
+    if (projects.length >= 0) {
+      initializeChat();
+    }
+  }, [projects]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -90,9 +100,17 @@ const AIChat = () => {
     setAiLoading(true);
 
     try {
+      // Prepare user projects list to send to AI
+      const userProjects = projects.map(p => ({
+        id: p.id,
+        name: p.name,
+        description: p.description || ''
+      }));
+      
       const res = await aiService.chat(
         [...aiMessages, { role: 'user', content: userMessage }],
-        selectedProjectName || null
+        selectedProjectName || null,
+        userProjects
       );
       if (res.success && res.data) {
         setAiMessages(prev => [...prev, { 
@@ -117,7 +135,14 @@ const AIChat = () => {
       const initializeChat = async () => {
         try {
           setAiLoading(true);
-          const res = await aiService.chat([], selectedProjectName || null);
+          // Prepare user projects list to send to AI
+          const userProjects = projects.map(p => ({
+            id: p.id,
+            name: p.name,
+            description: p.description || ''
+          }));
+          
+          const res = await aiService.chat([], selectedProjectName || null, userProjects);
           if (res.success && res.data) {
             setAiMessages([{
               role: res.data.role || 'assistant',
@@ -407,17 +432,17 @@ const AIChat = () => {
                 <h4>Xin chào! Tôi là AI Assistant</h4>
                 <p>Tôi có thể giúp bạn:</p>
                 <ul>
-                  <li>Đề xuất các mô hình phát triển phần mềm (Scrum, Waterfall, Agile, Kanban, v.v.)</li>
-                  <li>Gợi ý quy trình phát triển theo mô hình bạn chọn</li>
+                  <li>Bắt đầu một dự án mới với các gợi ý task phù hợp</li>
+                  <li>Phát triển dự án có sẵn của bạn với các bước tiếp theo</li>
+                  <li>Đề xuất quy trình phát triển theo mô hình SDLC chuẩn</li>
                   <li>Tư vấn về best practices trong quản lý dự án</li>
-                  <li>Trả lời các câu hỏi về phát triển phần mềm</li>
                 </ul>
                 <div className="welcome-examples">
                   <p><strong>Ví dụ câu hỏi:</strong></p>
                   <ul>
-                    <li>"Tôi muốn phát triển dự án theo mô hình Scrum"</li>
-                    <li>"Gợi ý các task cho dự án website bán hàng"</li>
-                    <li>"Mô hình nào phù hợp cho dự án nhỏ?"</li>
+                    <li>"Tôi muốn bắt đầu dự án mới về website bán hàng"</li>
+                    <li>"Phát triển dự án [tên dự án] của tôi"</li>
+                    <li>"Gợi ý các task cho giai đoạn phát triển"</li>
                   </ul>
                 </div>
               </div>

@@ -1,7 +1,25 @@
+/* Background Image */
+.page-bgr {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.page-bgr img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.6);
+}
+
 .about-page {
   min-height: 100vh;
-  background-image: url(../../assets/img/ai-5202865_1920.jpg);
-  background-repeat: no-repeat;
+  position: relative;
+  z-index: 1;
 }
 
 /* Hero Section */

@@ -3,6 +3,7 @@ import Footer from '../../components/footer/Footer'
 import './LearnMore.css'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import imgBgr from '../../assets/img/laptop-6966045_1920.jpg'
 
 const LearnMore = () => {
   const navigate = useNavigate()
@@ -18,6 +19,11 @@ const LearnMore = () => {
 
   return (
     <div className="container">
+      {/* Background Image */}
+      <div className="page-bgr">
+        <img src={imgBgr} alt="background"/>
+      </div>
+
       <Header />
       
       <div className="learn-more-page">

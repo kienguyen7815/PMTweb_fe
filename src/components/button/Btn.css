@@ -31,20 +31,3 @@
   transform: translateY(-4px);
 }
 
-/* Styles cho buttons khi header ở nền sáng */
-.header-light-bg .btn-pale {
-  background: #fff;
-  color: #132a3e;
-  border: 2px solid #132a3e;
-}
-
-
-.header-light-bg .btn-bold {
-  background: #132a3e;
-  color: #fff;
-  border: none;
-}
-.header-light-bg .btn-pale:hover,
-.header-light-bg .btn-bold:hover {
-   transform: translateY(-4px);
-}
