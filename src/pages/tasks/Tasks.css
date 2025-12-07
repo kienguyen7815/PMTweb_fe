@@ -966,6 +966,31 @@
   font-size: 14px;
 }
 
+/* Status Dropdown in Detail Modal */
+.status-dropdown {
+  padding: 8px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1e293b;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  width: 100%;
+  max-width: 250px;
+}
+
+.status-dropdown:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.status-dropdown:hover {
+  border-color: #cbd5e1;
+}
+
 /* Add Member Modal */
 .add-member-content {
   display: flex;
