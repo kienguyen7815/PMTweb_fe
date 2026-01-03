@@ -11,12 +11,10 @@ export const getLastName = (fullName) => {
   
   const nameParts = fullName.trim().split(/\s+/);
   
-  // Chỉ lấy tên cuối cùng nếu có 3 từ trở lên
   if (nameParts.length >= 3) {
     return nameParts[nameParts.length - 1];
   }
   
-  // Nếu có ít hơn 3 từ, trả về tên đầy đủ
   return fullName;
 };
 
