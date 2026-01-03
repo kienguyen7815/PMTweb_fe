@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import aiService from '../../services/aiService';
 import projectService from '../../services/projectService';
 import taskService from '../../services/taskService';
@@ -8,7 +7,6 @@ import { ToastContainer } from '../../components/toast/Toast';
 import './AIChat.css';
 
 const AIChat = () => {
-  const navigate = useNavigate();
   const { toasts, addToast, removeToast } = useToast();
   const [aiMessages, setAiMessages] = useState([]);
   const [aiInput, setAiInput] = useState('');
@@ -59,11 +57,9 @@ const AIChat = () => {
 
   // Initialize conversation with AI suggestion
   useEffect(() => {
-    // Start conversation by asking AI about project choice
     const initializeChat = async () => {
       try {
         setAiLoading(true);
-        // Prepare user projects list to send to AI
         const userProjects = projects.map(p => ({
           id: p.id,
           name: p.name,
@@ -83,8 +79,6 @@ const AIChat = () => {
         setAiLoading(false);
       }
     };
-
-    // Only initialize after projects are loaded
     if (projects.length >= 0) {
       initializeChat();
     }
@@ -100,7 +94,6 @@ const AIChat = () => {
     setAiLoading(true);
 
     try {
-      // Prepare user projects list to send to AI
       const userProjects = projects.map(p => ({
         id: p.id,
         name: p.name,
@@ -123,7 +116,6 @@ const AIChat = () => {
         
         setAiMessages(prev => [...prev, aiResponse]);
         
-        // Nếu có export_data, hiển thị thông báo
         if (res.data.export_data) {
           addToast('Đã xuất danh sách tasks dạng JSON. Bạn có thể copy để sử dụng.', 'success');
         }
@@ -132,8 +124,6 @@ const AIChat = () => {
       }
     } catch (err) {
       console.error('AI Chat Error:', err);
-      
-      // Xử lý quota exceeded error
       if (err?.response?.status === 429) {
         const errorData = err.response.data;
         if (errorData.error === 'QUOTA_EXCEEDED') {
@@ -155,11 +145,9 @@ const AIChat = () => {
     if (window.confirm('Bạn có chắc muốn xóa toàn bộ cuộc trò chuyện?')) {
       setAiMessages([]);
       setAiInput('');
-      // Re-initialize conversation
       const initializeChat = async () => {
         try {
           setAiLoading(true);
-          // Prepare user projects list to send to AI
           const userProjects = projects.map(p => ({
             id: p.id,
             name: p.name,
@@ -190,21 +178,17 @@ const AIChat = () => {
     const suggestions = [];
     const seen = new Set();
     
-    // Split by lines and process
     const lines = content.split('\n');
     
-    // Debug: Log content to see what AI returns
     if (process.env.NODE_ENV === 'development') {
       console.log('Parsing AI content for suggestions:', content.substring(0, 500));
     }
     
-    // Skip parsing if content contains project list section
     const lowerContent = content.toLowerCase();
     if (lowerContent.includes('danh sách các dự án') || 
         lowerContent.includes('danh sách dự án') ||
         lowerContent.includes('dự án hiện có của bạn') ||
         lowerContent.includes('các dự án hiện có')) {
-      // Don't parse project lists as task suggestions
       return [];
     }
     
@@ -212,7 +196,6 @@ const AIChat = () => {
       let line = lines[i].trim();
       if (!line) continue;
       
-      // Skip common non-task lines and project selection related lines
       if (line.toLowerCase().includes('ví dụ') || 
           line.toLowerCase().includes('lưu ý') ||
           line.toLowerCase().includes('chú ý') ||
@@ -225,19 +208,14 @@ const AIChat = () => {
         continue;
       }
       
-      // Match patterns like "1. Task name: Description", "1. Task name - Description", etc.
-      // Try multiple patterns to catch different formats
       let taskName = '';
       let description = '';
-      
-      // Pattern 1: "1. Task name: Description" (with colon)
+
       const taskMatchWithDesc1 = line.match(/^[\d\-\•\*]\s+(.+?)\s*[:：]\s*(.+)$/);
       if (taskMatchWithDesc1) {
         taskName = taskMatchWithDesc1[1].trim();
         description = taskMatchWithDesc1[2].trim();
       } else {
-        // Pattern 2: "1. Task name - Description" (with dash, but not at start)
-        // Make sure dash is not part of the task name (avoid matching "Task - name")
         const taskMatchWithDesc2 = line.match(/^[\d\-\•\*]\s+(.+?)\s+-\s+(.+)$/);
         if (taskMatchWithDesc2 && taskMatchWithDesc2[2].length > 5) {
           taskName = taskMatchWithDesc2[1].trim();
@@ -246,10 +224,8 @@ const AIChat = () => {
       }
       
       if (taskName && description && description.length > 3) {
-        // Clean up task name and description
         taskName = taskName.replace(/^[:\-]\s*/, '').trim();
         description = description.trim();
-        // Remove trailing punctuation from description if needed
         description = description.replace(/^[.!?]\s*/, '').trim();
         
         if (taskName.length > 3 && taskName.length < 100 && 
@@ -257,7 +233,6 @@ const AIChat = () => {
             !seen.has(taskName.toLowerCase())) {
           seen.add(taskName.toLowerCase());
           
-          // Debug: Log parsed suggestion
           if (process.env.NODE_ENV === 'development') {
             console.log('Parsed suggestion with description:', { name: taskName, description });
           }
@@ -271,18 +246,13 @@ const AIChat = () => {
         continue;
       }
       
-      // Match patterns like "1. Task name" (without description)
       const taskMatch = line.match(/^[\d\-\•\*]\s+(.+?)(?:[:：]|$)/);
       if (taskMatch) {
         let taskName = taskMatch[1].trim();
-        // Remove trailing punctuation if it's just one character
         taskName = taskName.replace(/^[:\-]\s*/, '').trim();
-        
-        // Try to get description from next line if available
         let description = '';
         if (i + 1 < lines.length) {
           const nextLine = lines[i + 1].trim();
-          // If next line doesn't start with number/bullet and is not empty, use it as description
           if (nextLine && !/^[\d\-\•\*]/.test(nextLine) && nextLine.length > 10 && nextLine.length < 200) {
             description = nextLine;
           }
@@ -299,16 +269,13 @@ const AIChat = () => {
         continue;
       }
       
-      // Match lines that look like task items (start with capital, reasonable length)
       if (line.length > 10 && line.length < 150 && 
           /^[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ]/.test(line)) {
-        // Check if it's not a question or explanation
         if (!line.includes('?') && 
             !line.toLowerCase().includes('là gì') &&
             !line.toLowerCase().includes('như thế nào') &&
             !line.toLowerCase().includes('tại sao')) {
-          
-          // Clean up the task name
+
           let taskName = line.replace(/[.!?]$/, '').trim();
           
           if (taskName.length > 5 && taskName.length < 100 && 
@@ -324,10 +291,9 @@ const AIChat = () => {
       }
     }
     
-    return suggestions.slice(0, 10); // Limit to 10 suggestions
+    return suggestions.slice(0, 10); 
   };
 
-  // Add task from AI suggestion
   const handleAddTask = async (suggestion) => {
     if (!selectedProjectId) {
       addToast('Vui lòng chọn dự án trước khi thêm task', 'warning');
@@ -338,7 +304,6 @@ const AIChat = () => {
     setAddingTasks(prev => new Set(prev).add(taskId));
 
     try {
-      // Debug: Log suggestion to see if description is present
       if (process.env.NODE_ENV === 'development') {
         console.log('Adding task with suggestion:', suggestion);
       }
@@ -367,12 +332,8 @@ const AIChat = () => {
       });
     }
   };
-
-  // Render message with suggestions
-  const renderMessageContent = (content, messageIndex, messageData) => {
+  const renderMessageContent = (content, messageData) => {
     if (!content) return null;
-    
-    // Nếu là export type, hiển thị JSON đặc biệt
     if (messageData?.type === 'export' && messageData?.export_data) {
       const jsonString = JSON.stringify(messageData.export_data, null, 2);
       
@@ -405,12 +366,10 @@ const AIChat = () => {
       return <div className="ai-message-text">{content}</div>;
     }
 
-    // Render suggestions as a list at the end of the message
     return (
       <div className="ai-message-text">
         <div className="message-main-content">
           {content.split('\n').map((line, lineIdx) => {
-            // Check if this line contains a suggestion
             const suggestion = suggestions.find(s => 
               line.includes(s.originalLine) || line.includes(s.name)
             );

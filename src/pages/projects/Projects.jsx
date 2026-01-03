@@ -46,7 +46,7 @@ const Projects = () => {
     setToasts(prev => [...prev, { id, message, type }]);
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
-    }, 2500);
+    }, 4000);
   };
 
   const resetForm = () => {
@@ -57,10 +57,9 @@ const Projects = () => {
   };
 
   const closeFormOnly = () => {
-    setIsFormOpen(false); // giữ nguyên draft
+    setIsFormOpen(false); 
   };
 
-  // Search members by email via API - Backend handles all filtering logic
   useEffect(() => {
     const searchMembers = async () => {
       if (!memberQuery.trim()) {
@@ -69,10 +68,8 @@ const Projects = () => {
       }
       
       try {
-        // Search by email from members table - limit to 6 results
         const res = await memberService.searchEmails(memberQuery.trim(), 6);
         if (res.success && res.data) {
-          // Filter out members already in members list
           const existingIds = form.members.map(m => m.user_id || m.member_id);
           const available = res.data.filter(m => !existingIds.includes(m.id));
           setFilteredUsers(available);
@@ -80,25 +77,21 @@ const Projects = () => {
           setFilteredUsers([]);
         }
       } catch (err) {
-        // Log error for debugging
         if (process.env.NODE_ENV === 'development') {
           console.error('Error searching members by email:', err);
         }
         setFilteredUsers([]);
-        // Optionally show error toast
         if (err?.response?.status === 403) {
           addToast('Bạn không có quyền tìm kiếm email', 'danger');
         }
       }
     };
     
-    const timeoutId = setTimeout(searchMembers, 300); // Debounce 300ms
+    const timeoutId = setTimeout(searchMembers, 300); 
     return () => clearTimeout(timeoutId);
   }, [memberQuery, form.members]);
 
   const handleAddMember = (memberToAdd) => {
-    // Backend will validate duplicate when submit, Frontend just add to form state
-    // Note: members table uses 'name' instead of 'username'
     setForm(prev => ({ 
       ...prev, 
       members: [...prev.members, { 
@@ -118,10 +111,8 @@ const Projects = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Backend handles all validation, Frontend just submit
     try {
       if (editingId) {
-        // Update project with members - Backend handles all logic
         const res = await projectService.update(editingId, {
           name: form.name,
           description: form.description,
@@ -136,7 +127,6 @@ const Projects = () => {
           addToast('Đã lưu chỉnh sửa dự án');
         }
       } else {
-        // Create project with members - Backend handles all logic
         const res = await projectService.create({
           name: form.name,
           description: form.description,
@@ -159,7 +149,6 @@ const Projects = () => {
 
   const handleEdit = async (project) => {
     try {
-      // Load full project data from API (including members)
       const res = await projectService.get(project.id);
       if (res.success) {
         const fullProject = res.data;
@@ -236,7 +225,6 @@ const Projects = () => {
   };
 
 
-  // Load projects and statuses on mount
   useEffect(() => {
     const load = async () => {
       try {

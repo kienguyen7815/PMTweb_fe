@@ -3,15 +3,15 @@ import { useState, useCallback } from 'react';
 const useToast = () => {
   const [toasts, setToasts] = useState([]);
 
-  // Thêm thông báo mới và tự động ẩn sau 3 giây
+  // Thêm thông báo mới và tự động ẩn
   const addToast = useCallback((message, type = 'success') => {
     const id = `toast_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     setToasts(prev => [...prev, { id, message, type }]);
     
-    // Tự động xóa toast sau 3 giây
+    // Tự động xóa toast
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
-    }, 3000);
+    }, 5000);
   }, []);
 
   // Xóa thông báo thủ công khi user click
